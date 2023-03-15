@@ -1,78 +1,79 @@
 import re
 import socket
+import threading
+
 import pyautogui
-
-# Global constants
-SERVER_HOST = "192.168.1.111"  # Replace with your server's IP address
-SERVER_PORT = 9999
-BUFFER_SIZE = 1024
-
-# Create client socket and connect to server
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client_socket.connect((SERVER_HOST, SERVER_PORT))
+from PyQt5.QtWidgets import QMainWindow
 
 
-def validate(string):
-    # define the pattern
-    # pattern = r"\w{4,}:\w,\w,\w{4,}"
-    pattern = r"\w+:\w+(,\w+){2}"
+class Client(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.controller = threading.Event()
+        # Global constants
+        self.SERVER_HOST = "192.168.1.100"  # Replace with your server's IP address
+        self.SERVER_PORT = 9999
+        self.BUFFER_SIZE = 1024
 
-    # check if the test string matches the pattern
-    if re.match(pattern, string):
-        return True
-    else:
-        return False
-
-
-# Mouse event handler
-def handle_mouse_event(data):
-    x, y, button = data.split(",")
-    x = int(x)
-    y = int(y)
-    button = button.strip()
-
-    # Perform mouse action based on button value
-    if button == "left":
-        pyautogui.click(x=x, y=y, button="left")
-    elif button == "right":
-        pyautogui.click(x=x, y=y, button="right")
-    elif button == "middle":
-        pyautogui.click(x=x, y=y, button="middle")
-    elif button == "move":
-        pyautogui.moveTo(x=x, y=y)
+        # Create client socket and connect to server
+        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.client_socket.connect((self.SERVER_HOST, self.SERVER_PORT))
 
 
-# Keyboard event handler
-def handle_keyboard_event(data):
-    key, action = data.split(",")
-    key = key.strip()
-    action = action.strip()
+    def validate(self, string):
+        # define the pattern
+        # pattern = r"\w{4,}:\w,\w,\w{4,}"
+        pattern = r"\w+(,\w+){2}"
 
-    # Perform keyboard action based on key and action values
-    if action == "down":
-        pyautogui.keyDown(key)
-    elif action == "up":
-        pyautogui.keyUp(key)
-    else:
-        pyautogui.press(key)
+        # check if the test string matches the pattern
+        if re.match(pattern, string):
+            return True
+        else:
+            return False
 
 
-# Receive data from client and handle mouse and keyboard events
-try:
-    while True:
-        data = client_socket.recv(BUFFER_SIZE).decode()
-        if not data:  # No data received means the client has disconnected
-            break
+    # Mouse event handler
+    def handle_mouse_event(self, data):
+        x, y, button = data.split(",")
+        x = int(x)
+        y = int(y)
 
-        all_data = data.split(";")
-        for entry in all_data:
-            if validate(entry):
-                print(entry)
-                event_type, payload = entry.split(":")
-                if event_type == "mouse":
-                    handle_mouse_event(payload)
-                elif event_type == "keyboard":
-                    handle_keyboard_event(payload)
-finally:
-    print(f"disconnected.")
-    client_socket.close()
+        # Perform mouse action based on button value
+        if button in ["left", "right", "middle"]:
+            pyautogui.click(x=x, y=y, button=button)
+        elif button == "move":
+            pyautogui.moveTo(x=x, y=y)
+
+    # # Keyboard event handler
+    # def handle_keyboard_event(self, data):
+    #     key, action = data.split(",")
+    #     key = key.strip()
+    #     action = action.strip()
+    #
+    #     # Perform keyboard action based on key and action values
+    #     if action == "down":
+    #         pyautogui.keyDown(key)
+    #     elif action == "up":
+    #         pyautogui.keyUp(key)
+    #     else:
+    #         pyautogui.press(key)
+    def connect(self):
+        # Receive data from client and handle mouse and keyboard events
+            while not self.controller.is_set():
+                data = self.client_socket.recv(self.BUFFER_SIZE).decode()
+                if not data:  # No data received means the client has disconnected
+                    break
+
+                all_data = data.split(";")
+                for entry in all_data:
+                    if self.validate(entry):
+                        print(entry)
+                        # event_type, payload = entry.split(":")
+                        # if event_type == "mouse":
+                        self.handle_mouse_event(entry)
+                        # elif event_type == "keyboard":
+                        #     self.handle_keyboard_event(payload)
+
+    def stop(self):
+        print(f"disconnected.")
+        self.client_socket.close()
