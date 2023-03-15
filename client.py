@@ -10,13 +10,6 @@ BUFFER_SIZE = 1024
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.connect((SERVER_HOST, SERVER_PORT))
 
-# Receive screen dimensions from server
-screen_dimensions = client_socket.recv(BUFFER_SIZE).decode()
-screen_width, screen_height = map(int, screen_dimensions.split(","))
-print(f"Connected to server {SERVER_HOST}:{SERVER_PORT}. Screen dimensions: ({screen_width}, {screen_height})")
-
-# Set the screen size of the local computer to match the remote server
-pyautogui.size()
 
 # Mouse event handler
 def handle_mouse_event(data):
@@ -26,6 +19,7 @@ def handle_mouse_event(data):
     button = button.strip()
 
     # Perform mouse action based on button value
+    print(button)
     if button == "left":
         pyautogui.click(x=x, y=y, button="left")
     elif button == "right":
@@ -34,6 +28,7 @@ def handle_mouse_event(data):
         pyautogui.click(x=x, y=y, button="middle")
     elif button == "move":
         pyautogui.moveTo(x=x, y=y)
+
 
 # Keyboard event handler
 def handle_keyboard_event(data):
@@ -49,13 +44,16 @@ def handle_keyboard_event(data):
     else:
         pyautogui.press(key)
 
+
 # Receive data from client and handle mouse and keyboard events
 try:
     while True:
         data = client_socket.recv(BUFFER_SIZE).decode()
         if not data:  # No data received means the client has disconnected
             break
-        event_type, payload = data.split(":")
+        all_data = data.split(";")
+        for entry in all_data:
+            event_type, payload = entry.split(":")
         if event_type == "mouse":
             handle_mouse_event(payload)
         elif event_type == "keyboard":
