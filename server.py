@@ -27,6 +27,8 @@ print(f"Client {client_address[0]}:{client_address[1]} is connected.")
 
 
 # Mouse event handler
+xa = 0
+ya = 0
 def handle_mouse_event(event_type, x, y, button):
     data = f"{x},{y},{button}"
     message = f"{event_type}:{data}"
@@ -43,7 +45,6 @@ def handle_keyboard_event(event_type, key, action):
 # Start mouse event listener thread
 def listen_for_mouse_events():
     while True:
-        x, y = pyautogui.position()
         # left_button, right_button, middle_button = pyautogui.mouseDown()
         #
         # # Listen for left mouse button press and release
@@ -66,9 +67,9 @@ def listen_for_mouse_events():
 
         # Listen for mouse movement
         new_x, new_y = pyautogui.position()
-        if new_x != x or new_y != y:
-            x, y = new_x, new_y
-            handle_mouse_event(";mouse", x, y, "move")
+        if new_x != xa or new_y != ya:
+            xa, ya = new_x, new_y
+            handle_mouse_event("mouse", xa, ya, "move;")
 
 
 def listen_for_keyboard_events():
