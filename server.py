@@ -15,16 +15,15 @@ class Server:
         self.controller = threading.Event()
         # Global constants
         self.HOST = ''  # Use all available interfaces
-        self.PORT = 80  # Arbitrary non-privileged port
+        self.PORT = 9999  # Arbitrary non-privileged port
         self.BUFFER_SIZE = 1024
 
         # Create server socket
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # Enable reuse of the same address
-        # self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)  # Enable reuse of the same address
+        self.server_socket.setblocking(False)  # set the socket to non-blocking mode
 
         self.server_socket.bind((self.HOST, self.PORT))  # bind the socket to a local address and port
-        # self.server_socket.setblocking(False)  # set the socket to non-blocking mode
         self.server_socket.listen(5)  # Listen for one connection at a time only
         print(f"Server started and listening on port {self.PORT}...")
 
@@ -40,7 +39,6 @@ class Server:
         data = f"{x},{y},{button};"
         # message = data
         self.client_socket.sendall(data.encode())
-
     # # Keyboard event handler
     # def handle_keyboard_event(self, event_type, key, action):
     #     data = f"{key},{action}"
@@ -77,10 +75,8 @@ class Server:
             new_x, new_y = pyautogui.position()
             if new_x != self.xa or new_y != self.ya:
                 self.xa, self.ya = new_x, new_y
-                print(new_x, new_y, "location")
                 self.handle_mouse_event(new_x, new_y, "move")
-                self.controller.wait(0.09)
-
+                self.controller.wait(0.05)
     # def listen_for_keyboard_events(self):
     #     while not self.controller.is_set():
     #         event = keyboard.read_event()
