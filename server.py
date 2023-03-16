@@ -5,9 +5,7 @@ import pyautogui
 import keyboard
 from PyQt5.QtWidgets import QWidget, QApplication
 from PyQt5 import QtWidgets
-
-# Send screen dimensions to client
-# client_socket.sendall(f"{SCREEN_WIDTH},{SCREEN_HEIGHT}".encode())
+from pynput.mouse import Listener
 
 
 class Server:
@@ -21,15 +19,8 @@ class Server:
         # Create server socket
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # Enable reuse of the same address
-        self.server_socket.setblocking(False)  # set the socket to non-blocking mode
 
         self.server_socket.bind((self.HOST, self.PORT))  # bind the socket to a local address and port
-        self.server_socket.listen(5)  # Listen for one connection at a time only
-        print(f"Server started and listening on port {self.PORT}...")
-
-        # Wait for client to connect
-        self.client_socket, self.client_address = self.server_socket.accept()
-        print(f"Client {self.client_address[0]}:{self.client_address[1]} is connected.")
 
         self.xa = 0
         self.ya = 0
@@ -45,38 +36,27 @@ class Server:
     #     message = f"{event_type}:{data}"
     #     self.client_socket.sendall(message.encode())
 
+    def on_click(x, y, button, pressed):
+        if pressed:
+            print('Mouse clicked at ({0}, {1}) with {2}'.format(x, y, button))
+
     def listen_for_mouse_events(self):
+        self.server_socket.listen(5)  # Listen for one connection at a time only
+        print(f"Server started and listening on port {self.PORT}...")
+        # Wait for client to connect
+        self.client_socket, self.client_address = self.server_socket.accept()
+
+        SCREEN_WIDTH, SCREEN_HEIGHT = pyautogui.size()
+        self.client_socket.sendall(f"{SCREEN_WIDTH},{SCREEN_HEIGHT}".encode())  # Send screen dimensions to client
+        print(f"Client {self.client_address[0]}:{self.client_address[1]} is connected.")
+
         """ Start mouse event listener thread """
-        self.controller.clear()
         while not self.controller.is_set():
-            # left_button, right_button, middle_button = pyautogui.mouseDown()
-            #
-            # # Listen for left mouse button press and release
-            # if left_button:
-            #     handle_mouse_event("mouse", x, y, "left")
-            #     while pyautogui.mouseDown()[0]:
-            #         pass
-            #
-            # # Listen for right mouse button press and release
-            # if right_button:
-            #     handle_mouse_event("mouse", x, y, "right")
-            #     while pyautogui.mouseDown()[1]:
-            #         pass
-            #
-            # # Listen for middle mouse button press and release
-            # if middle_button:
-            #     handle_mouse_event("mouse", x, y, "middle")
-            #     while pyautogui.mouseDown()[2]:
-            #         pass
-
-            # Listen for mouse movement
-            # print(self.xa, self.ya, "location")
-
             new_x, new_y = pyautogui.position()
             if new_x != self.xa or new_y != self.ya:
                 self.xa, self.ya = new_x, new_y
                 self.handle_mouse_event(new_x, new_y, "move")
-                self.controller.wait(0.05)
+                self.controller.wait(0.1)
     # def listen_for_keyboard_events(self):
     #     while not self.controller.is_set():
     #         event = keyboard.read_event()

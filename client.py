@@ -11,6 +11,7 @@ class Client:
     def __init__(self):
         super().__init__()
         self.controller = threading.Event()
+        self.connecting = threading.Event()
         # Global constants
         self.SERVER_HOST = "192.168.1.111"  # Replace with your server's IP address
         self.SERVER_PORT = 9999
@@ -18,7 +19,7 @@ class Client:
 
         # Create client socket and connect to server
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.client_socket.connect((self.SERVER_HOST, self.SERVER_PORT))
+        # self.client_socket.recv()
 
     def handle_mouse_event(self, data):
         """ Mouse event handler """
@@ -30,7 +31,7 @@ class Client:
         if button in ["left", "right", "middle"]:
             pyautogui.click(x=x, y=y, button=button)
         elif button == "move":
-            pyautogui.moveTo(x=x, y=y)
+            pyautogui.moveTo(x=x, y=y, duration=0.099)
     # # Keyboard event handler
     # def handle_keyboard_event(self, data):
     #     key, action = data.split(",")
@@ -46,6 +47,8 @@ class Client:
     #         pyautogui.press(key)
 
     def listen_for_mouse_events(self):
+        self.client_socket.connect((self.SERVER_HOST, self.SERVER_PORT))
+
         while not self.controller.is_set():
             # self.client_socket.
             data = self.client_socket.recv(self.BUFFER_SIZE).decode()
