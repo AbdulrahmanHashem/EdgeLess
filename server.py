@@ -5,7 +5,6 @@ import pyautogui
 import keyboard
 from PyQt5.QtWidgets import QWidget, QApplication
 from PyQt5 import QtWidgets
-from pynput.mouse import Listener
 
 
 class Server:
