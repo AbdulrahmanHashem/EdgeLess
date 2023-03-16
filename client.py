@@ -2,7 +2,6 @@ import re
 import socket
 import sys
 import threading
-
 import pyautogui
 from PyQt5.QtWidgets import QMainWindow, QPushButton, QApplication
 
