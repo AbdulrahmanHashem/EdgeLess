@@ -3,7 +3,7 @@ import socket
 import sys
 import threading
 import pyautogui
-from PyQt5.QtWidgets import QMainWindow, QPushButton, QApplication
+from PyQt6.QtWidgets import QMainWindow, QPushButton, QApplication
 
 
 class Client:
@@ -30,19 +30,6 @@ class Client:
             pyautogui.click(x=x, y=y, button=button)
         elif button == "move":
             pyautogui.moveTo(x=x, y=y, duration=0.1)
-    # # Keyboard event handler
-    # def handle_keyboard_event(self, data):
-    #     key, action = data.split(",")
-    #     key = key.strip()
-    #     action = action.strip()
-    #
-    #     # Perform keyboard action based on key and action values
-    #     if action == "down":
-    #         pyautogui.keyDown(key)
-    #     elif action == "up":
-    #         pyautogui.keyUp(key)
-    #     else:
-    #         pyautogui.press(key)
 
     def listen_for_mouse_events(self):
         self.client_socket.connect((self.SERVER_HOST, self.SERVER_PORT))
@@ -56,13 +43,13 @@ class Client:
             if not data:  # No data received means the client has disconnected
                 break
 
-            all_data = data.split(";")
-            for entry in all_data:
-                # check if the test string matches the pattern
-                if re.match(r"\w+(,\w+){2}", entry):
-                    self.handle_mouse_event(entry)
-                    # elif event_type == "keyboard":
-                    #     self.handle_keyboard_event(payload)
+            print(data)
+            # all_data = data.split(";")
+            # for entry in all_data:
+            #     # check if the test string matches the pattern
+            #     if re.match(r"\w+(,\w+){2}", entry):
+            #         self.handle_mouse_event(entry)
+
 
     def connect(self):
         # Receive data from client and handle mouse and keyboard events
@@ -108,4 +95,4 @@ if __name__ == '__main__':
     window = Window()
     window.show()
 
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
