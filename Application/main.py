@@ -1,12 +1,23 @@
 import sys
-from PyQt6 import QtWidgets
+from PyQt6.QtWidgets import QApplication
+
+from Application.UserInterface.ClientUI import ClientWindow
 from Application.UserInterface.ServerUI import ServerWindow
 
+#
+# if __name__ == '__main__':
+#     app = QApplication(sys.argv)
+#
+#     server_window = ServerWindow()
+#     server_window.show()
+#
+#     sys.exit(app.exec())
+#
 
 if __name__ == '__main__':
-    app = QtWidgets.QApplication(sys.argv)
+    app = QApplication(sys.argv)
 
-    server_window = ServerWindow()
-    server_window.show()
+    client_window = ClientWindow()
+    client_window.show()
 
     sys.exit(app.exec())
