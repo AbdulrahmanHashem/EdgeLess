@@ -1,8 +1,10 @@
-import socket
 import threading
 
+import mouse
 from PyQt6 import QtWidgets
 from PyQt6.QtCore import Qt
+
+from Application.EventListeners.mouse_events import listen_to_lc, listen_to_rc, mouse_movement
 from Application.Networking.server import Server
 
 
@@ -28,25 +30,54 @@ class ServerWindow(QtWidgets.QMainWindow):
         self.start.clicked.connect(self.toggle_server)
         # address_port.setText(str(server.getsockname()))
 
-    def toggle_server(self):
+        self.mouse_loc = (0, 0)
+        self.controller = threading.Event()
+
+    def toggle_server(self) -> None:
         if self.start.text() == "Start Server":
             self.server.__init__()
+            self.controller.clear()
             if self.server.run():
                 self.address_port.setText(str(self.server.getsockname()))
                 self.start.setText("Stop Server")
                 self.connect()  # start connecting
         else:
+            self.controller.set()
             self.server.stop()
             self.address_port.setText("")
             self.start.setText("Start Server")
 
-    def connect(self):
+    def connect(self) -> None:
         def on_connected():
             self.address_port.setText(
-                self.address_port.text() + "\n" + self.server.client_socket + " : " + self.server.client_address)
-        mouse_thread = threading.Thread(target=lambda: self.server.connect_now(on_connected))
-        mouse_thread.daemon = True
+                self.address_port.text() + "\n" + "Connected to" + "\n" + str(self.server.client_address[0]) + " : " + str(self.server.client_address[1]))
+            self.start_sending()
+
+        connect_thread = threading.Thread(target=lambda: self.server.connect_now(on_connected))
+        connect_thread.daemon = True
         try:
-            mouse_thread.start()
+            connect_thread.start()
         except Exception as e:
             print(e)
+
+    def start_sending(self) -> None:
+        def listen_to_mouse():
+            listen_to_lc(self.server.send_data)
+            listen_to_rc(self.server.send_data)
+            while not self.controller.is_set():
+                loc = mouse_movement(self.mouse_loc)
+                # print(self.mouse_loc)
+                if loc is not None:
+                    self.mouse_loc = mouse.get_position()
+                    self.server.send_data(loc)
+                    self.controller.wait(0.04)
+
+        if self.server.connected:
+            mouse_thread = threading.Thread(target=listen_to_mouse)
+            mouse_thread.daemon = True
+            try:
+                mouse_thread.start()
+            except Exception as e:
+                print(e)
+        else:
+            print("Not Connected")

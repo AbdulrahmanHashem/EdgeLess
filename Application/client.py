@@ -12,7 +12,7 @@ class Client:
         self.controller = threading.Event()
         self.connecting = threading.Event()
         # Global constants
-        self.SERVER_HOST = "192.168.1.111"  # Replace with your server's IP address
+        self.SERVER_HOST = "192.168.1.100"  # Replace with your server's IP address
         self.SERVER_PORT = 9999
         self.BUFFER_SIZE = 1024
         self.screen_ratio = 1
@@ -49,7 +49,6 @@ class Client:
             #     # check if the test string matches the pattern
             #     if re.match(r"\w+(,\w+){2}", entry):
             #         self.handle_mouse_event(entry)
-
 
     def connect(self):
         # Receive data from client and handle mouse and keyboard events

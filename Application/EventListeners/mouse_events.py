@@ -1,8 +1,4 @@
-import threading
 import mouse
-
-controller = threading.Event()
-
 
 # def listen_to_all():
 #     def event_handler(event):
@@ -16,32 +12,34 @@ controller = threading.Event()
 #         # mouse.wait()
 
 
-def listen_to_movement(send):
-    def on_move(event):
-        if isinstance(event, mouse.MoveEvent):
-            print(event)
-            send(event)
+# def listen_to_movement(send=None):
+#     def on_move(event):
+#         if isinstance(event, mouse.MoveEvent):
+#             # print(event)
+#             send(event)
+#
+#     mouse.hook(on_move)
 
-    mouse.hook(on_move)
-
-
-def listen_to_lc(send):
+def listen_to_lc(send=None):
     def on_click(event):
-        print(event)
+        # print(event)
         send(event)
 
-    mouse.on_button(on_click, args=(["DOWN"]), buttons=mouse.LEFT, types=mouse.DOWN)
-    mouse.on_button(on_click, args=(["UP"]), buttons=mouse.LEFT, types=mouse.UP)
-    mouse.on_button(on_click, args=(["DOUBLE"]), buttons=mouse.LEFT, types=mouse.DOUBLE)
-    controller.wait()
+    mouse.on_button(on_click, args=([f"ButtonEvent, {mouse.LEFT}, {mouse.DOWN};"]), buttons=mouse.LEFT, types=mouse.DOWN)
+    mouse.on_button(on_click, args=([f"ButtonEvent, {mouse.LEFT}, {mouse.UP};"]), buttons=mouse.LEFT, types=mouse.UP)
+    mouse.on_button(on_click, args=([f"ButtonEvent, {mouse.LEFT}, {mouse.DOUBLE};"]), buttons=mouse.LEFT, types=mouse.DOUBLE)
 
 
-def listen_to_rc(send):
+def listen_to_rc(send=None):
     def on_click(event):
-        print(event)
+        # print(event)
         send(event)
 
-    mouse.on_button(on_click, args=(["DOWN"]), buttons=mouse.RIGHT, types=mouse.DOWN)
-    mouse.on_button(on_click, args=(["UP"]), buttons=mouse.RIGHT, types=mouse.UP)
-    mouse.on_button(on_click, args=(["DOUBLE"]), buttons=mouse.RIGHT, types=mouse.DOUBLE)
-    controller.wait()
+    mouse.on_button(on_click, args=([f"ButtonEvent, {mouse.RIGHT}, {mouse.DOWN};"]), buttons=mouse.RIGHT, types=mouse.DOWN)
+    mouse.on_button(on_click, args=([f"ButtonEvent, {mouse.RIGHT}, {mouse.UP};"]), buttons=mouse.RIGHT, types=mouse.UP)
+    mouse.on_button(on_click, args=([f"ButtonEvent, {mouse.RIGHT}, {mouse.DOUBLE};"]), buttons=mouse.RIGHT, types=mouse.DOUBLE)
+
+
+def mouse_movement(cxy) -> str | None:
+    x, y = mouse.get_position()
+    return f"MoveEvent, {x}, {y};" if x != cxy[0] or y != cxy[1] else None
