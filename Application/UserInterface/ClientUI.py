@@ -31,8 +31,8 @@ class ClientWindow(QMainWindow):
             self.screen_ratio = self.client.receive_screen_dims()
             self.start()
 
-        def on_disconnect():
-            self.switch.setText("Connect")
+        # def on_disconnect():
+        #
 
         self.client.__init__()
         connect = threading.Thread(
@@ -40,7 +40,7 @@ class ClientWindow(QMainWindow):
             if
             self.switch.text() == "Connect"
             else
-            self.client.disconnect(on_disconnect)
+            self.client.disconnect(lambda: self.switch.setText("Connect"))
         )
         connect.daemon = True
         connect.start()
@@ -51,9 +51,13 @@ class ClientWindow(QMainWindow):
         mouse_thread.start()
 
     def listen_for_mouse_events(self):
-        # self.last_pressed = ["", ""]
         while not self.controller.is_set():
             data = self.client.receive()
+
+            if data.strip().__contains__("clo"):
+                self.client.send("ok")
+                self.client.disconnect(lambda: self.switch.setText("Connect"))
+
             all_data = data.split(";")
             for entry in all_data:
                 if not entry == "":
@@ -63,7 +67,6 @@ class ClientWindow(QMainWindow):
 
     def handle_mouse_event(self, data):
         """ Mouse event handler """
-        # print(f"'{data}'")
         button, x, y = data.split(",")
 
         # Perform mouse action based on button value
@@ -78,6 +81,6 @@ class ClientWindow(QMainWindow):
                 print(e)
         else:
             try:
-                mouse.play([mouse.WheelEvent(x.strip(), y.strip())])
+                mouse.play([mouse.WheelEvent(delta=x.strip(), time=y.strip())])
             except Exception as e:
                 print(e)

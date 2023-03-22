@@ -40,10 +40,12 @@ class ServerWindow(QtWidgets.QMainWindow):
                 self.start.setText("Stop Server")
                 self.connect()  # start connecting
         else:
-            self.controller.set()
-            self.server.stop()
-            self.address_port.setText("")
-            self.start.setText("Start Server")
+            self.server.send_data("close")
+            if self.server.recv(self.server.BUFFER_SIZE).decode().strip() == "ok":
+                self.controller.set()
+                self.server.stop()
+                self.address_port.setText("")
+                self.start.setText("Start Server")
 
     def connect(self) -> None:
         def on_connected():

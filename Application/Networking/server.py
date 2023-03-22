@@ -51,13 +51,13 @@ class Server(socket.socket):
                 print("socket isn't connected")
         except Exception as e:
             print(e)
+        print("disconnected")
         self.connected = False
 
     def stop(self):
         try:
-            self.getpeername()
             self.shutdown(socket.SHUT_RDWR) # stop connection
         except Exception as e:
-            print("Socket Not Connected")
+            print("Socket Not Connected", e)
 
         self.close()
