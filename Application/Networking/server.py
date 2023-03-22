@@ -1,5 +1,7 @@
 import socket
 import threading
+
+import mouse
 import pyautogui
 from mouse import MoveEvent
 
@@ -55,9 +57,9 @@ class Server(socket.socket):
         self.connected = False
 
     def stop(self):
+        mouse.unhook_all()
         try:
             self.shutdown(socket.SHUT_RDWR) # stop connection
         except Exception as e:
             print("Socket Not Connected", e)
-
         self.close()
