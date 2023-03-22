@@ -1,3 +1,5 @@
+import threading
+
 import mouse
 
 
@@ -29,9 +31,18 @@ def listen_to_mc(send=None):
         # print(event)
         send(event)
 
-    mouse.on_button(on_click, args=([f"ButtonEvent, {mouse.DOWN}, {mouse.MIDDLE};"]), buttons=mouse.RIGHT, types=mouse.DOWN)
-    mouse.on_button(on_click, args=([f"ButtonEvent, {mouse.UP},  {mouse.MIDDLE};"]), buttons=mouse.RIGHT, types=mouse.UP)
-    mouse.on_button(on_click, args=([f"ButtonEvent, {mouse.DOUBLE}, {mouse.MIDDLE};"]), buttons=mouse.RIGHT, types=mouse.DOUBLE)
+    mouse.on_button(on_click, args=([f"ButtonEvent, {mouse.DOWN}, {mouse.MIDDLE};"]), buttons=mouse.MIDDLE, types=mouse.DOWN)
+    mouse.on_button(on_click, args=([f"ButtonEvent, {mouse.UP},  {mouse.MIDDLE};"]), buttons=mouse.MIDDLE, types=mouse.UP)
+    mouse.on_button(on_click, args=([f"ButtonEvent, {mouse.DOUBLE}, {mouse.MIDDLE};"]), buttons=mouse.MIDDLE, types=mouse.DOUBLE)
+
+
+def listen_to_ws(send=None):
+    def on_wheel(event: mouse.WheelEvent):
+        if isinstance(event, mouse.WheelEvent):
+            # print(event)
+            send(f"WheelEvent, {event.delta}, {event.time};")
+
+    mouse.hook(on_wheel)
 
 
 def listen_to_mm(cxy) -> str | None:
@@ -52,6 +63,3 @@ def perform_rc():
 
 def perform_mm():
     pass
-
-
-# mouse.play([mouse.ButtonEvent(event_type=x, button=y, time=0)], 0)

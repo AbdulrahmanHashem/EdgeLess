@@ -4,7 +4,7 @@ import mouse
 from PyQt6 import QtWidgets
 from PyQt6.QtCore import Qt
 
-from Application.EventListeners.mouse_events import listen_to_lc, listen_to_rc, listen_to_mm, listen_to_mc
+from Application.EventListeners.mouse_events import listen_to_lc, listen_to_rc, listen_to_mm, listen_to_mc, listen_to_ws
 from Application.Networking.server import Server
 
 
@@ -63,6 +63,7 @@ class ServerWindow(QtWidgets.QMainWindow):
             listen_to_lc(self.server.send_data)
             listen_to_rc(self.server.send_data)
             listen_to_mc(self.server.send_data)
+            listen_to_ws(self.server.send_data)
             while not self.controller.is_set():
                 loc = listen_to_mm(self.mouse_loc)
                 # print(self.mouse_loc)

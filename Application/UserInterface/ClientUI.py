@@ -16,7 +16,7 @@ class ClientWindow(QMainWindow):
         self.switch.clicked.connect(self.connect)
 
         self.controller = threading.Event()
-        self.connecting = threading.Event()
+        # self.connecting = threading.Event()
 
         self.client = Client()
         self.screen_ratio = 1
@@ -76,8 +76,8 @@ class ClientWindow(QMainWindow):
                 mouse.play([mouse.ButtonEvent(event_type=x.strip(), button=y.strip(), time=0)], 0)
             except Exception as e:
                 print(e)
-        # else:
-        #     try:
-        #         mouse.play()
-        #     except Exception as e:
-        #         print(e)
+        else:
+            try:
+                mouse.play([mouse.WheelEvent(x.strip(), y.strip())])
+            except Exception as e:
+                print(e)
