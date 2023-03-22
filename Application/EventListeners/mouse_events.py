@@ -6,7 +6,6 @@ import mouse
 
 """ listeners """
 
-
 # def listen_to_lc(send=None):
 #     def on_click(event):
 #         # print(event)
@@ -68,19 +67,31 @@ def listen_to_all_clicks_and_wheel(send, cxy, update_mouse_loc):
 """ mouse event executors """
 
 
-def perform_lc():
-    pass
+def mouse_event_performer(data, screen_ratio):
+    """ Mouse event handler """
+    try:
+        if data.__contains__("Move"):
+            button, x, y, t = data.split(",")
+            mouse.play([mouse.MoveEvent(
+                x=int(x) * screen_ratio,
+                y=int(y) * screen_ratio,
+                time=t)], 0)
 
-
-def perform_rc():
-    pass
-
-
-def perform_mm():
-    pass
+        elif data.__contains__("Button"):
+            button, x, y, t = data.split(",")
+            try:
+                mouse.play([mouse.ButtonEvent(event_type=x.strip(), button=y.strip(), time=t)], 0)
+            except Exception as e:
+                print(e)
+        else:
+            button, delta, t = data.split(",")
+            try:
+                mouse.play([mouse.WheelEvent(delta=float(delta.strip()), time=float(t.strip()))])
+            except Exception as e:
+                print(e)
+    except Exception as e:
+        print(e)
 
 
 """ Testing """
 
-
-print(datetime.datetime.now())

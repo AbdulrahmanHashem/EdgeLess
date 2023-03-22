@@ -9,7 +9,7 @@ class Client(socket.socket):
         # Global constants
         self.SERVER_HOST = "192.168.1.111"  # Replace with your server's IP address
         self.SERVER_PORT = 9999
-        self.BUFFER_SIZE = 1024
+        self.BUFFER_SIZE = 1024*2
         # Create client socket and connect to server
 
     def connect_now(self, on_connect: (), status_change: ()):
