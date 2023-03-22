@@ -12,32 +12,34 @@ class Client(socket.socket):
         self.BUFFER_SIZE = 1024
         # Create client socket and connect to server
 
-    def connect_now(self, on_connect: ()):
+    def connect_now(self, on_connect: (), status_change: ()):
         """ connects to the given server full address """
         try:
-            self.settimeout(10)
+            # self.settimeout(5)
             print(f"Attempting to connect to {self.SERVER_HOST}, {self.SERVER_PORT}")
+            status_change("Connecting")
             self.connect((self.SERVER_HOST, self.SERVER_PORT))
             on_connect()
+            return
         except socket.timeout as timeout:
             print(timeout)
-            return False
         except Exception as e:
             print(e)
-            return False
+
+        status_change("Connect")
+
+    def receive_screen_dims(self) -> int:
+        s_size = self.recv(self.BUFFER_SIZE).decode()
+        c_size = QGuiApplication.primaryScreen().availableGeometry()
+        return c_size.width() / int(s_size.split(",")[0])
 
     def receive(self) -> str:
         data: str = self.recv(self.BUFFER_SIZE).decode()
         if not data:  # No data received means the client has disconnected
             return ""
 
-        print(data)
+        # print(data)
         return data
-        # all_data = data.split(";")
-        # for entry in all_data:
-        #     # check if the test string matches the pattern
-        #     if re.match(r"\w+(,\w+){2}", entry):
-        #         self.handle_mouse_event(entry)
 
     def disconnect(self, on_disconnect: ()):
         try:

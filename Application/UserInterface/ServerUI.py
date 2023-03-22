@@ -4,7 +4,7 @@ import mouse
 from PyQt6 import QtWidgets
 from PyQt6.QtCore import Qt
 
-from Application.EventListeners.mouse_events import listen_to_lc, listen_to_rc, listen_to_mm
+from Application.EventListeners.mouse_events import listen_to_lc, listen_to_rc, listen_to_mm, listen_to_mc
 from Application.Networking.server import Server
 
 
@@ -25,10 +25,8 @@ class ServerWindow(QtWidgets.QMainWindow):
 
         # make a server instance
         self.server = Server()
-        # socket.gethostbyname(socket.gethostname())
 
         self.start.clicked.connect(self.toggle_server)
-        # address_port.setText(str(server.getsockname()))
 
         self.mouse_loc = (0, 0)
         self.controller = threading.Event()
@@ -64,13 +62,14 @@ class ServerWindow(QtWidgets.QMainWindow):
         def listen_to_mouse():
             listen_to_lc(self.server.send_data)
             listen_to_rc(self.server.send_data)
+            listen_to_mc(self.server.send_data)
             while not self.controller.is_set():
                 loc = listen_to_mm(self.mouse_loc)
                 # print(self.mouse_loc)
                 if loc is not None:
                     self.mouse_loc = mouse.get_position()
                     self.server.send_data(loc)
-                    self.controller.wait(0.04)
+                    self.controller.wait(0.01)
 
         if self.server.connected:
             mouse_thread = threading.Thread(target=listen_to_mouse)

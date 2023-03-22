@@ -43,10 +43,15 @@ class Server(socket.socket):
 
     def send_data(self, data: str):
         """ Mouse event handler """
-        if isinstance(self.client_socket, socket.socket):
-            self.client_socket.sendall(data.encode())
-        else:
-            print("socket isn't connected")
+        try:
+            if isinstance(self.client_socket, socket.socket):
+                self.client_socket.sendall(data.encode())
+                return None
+            else:
+                print("socket isn't connected")
+        except Exception as e:
+            print(e)
+        self.connected = False
 
     def stop(self):
         try:
