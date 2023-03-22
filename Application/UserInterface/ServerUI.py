@@ -4,7 +4,7 @@ import mouse
 from PyQt6 import QtWidgets
 from PyQt6.QtCore import Qt
 
-from Application.EventListeners.mouse_events import listen_to_lc, listen_to_rc, listen_to_mm, listen_to_mc, listen_to_ws
+from Application.EventListeners.mouse_events import listen_to_all_clicks_and_wheel
 from Application.Networking.server import Server
 
 
@@ -63,18 +63,16 @@ class ServerWindow(QtWidgets.QMainWindow):
             print(e)
 
     def start_sending(self) -> None:
+        def update_mouse_loc(xy):
+            self.mouse_loc = xy
+
         def listen_to_mouse():
-            listen_to_lc(self.server.send_data)
-            listen_to_rc(self.server.send_data)
-            listen_to_mc(self.server.send_data)
-            listen_to_ws(self.server.send_data)
             while not self.controller.is_set():
-                loc = listen_to_mm(self.mouse_loc)
-                # print(self.mouse_loc)
-                if loc is not None:
-                    self.mouse_loc = mouse.get_position()
-                    self.server.send_data(loc)
-                    self.controller.wait(0.01)
+                listen_to_all_clicks_and_wheel(self.server.send_data, self.mouse_loc, update_mouse_loc)
+                self.controller.wait()
+                # if loc is not None:
+                #     self.mouse_loc = mouse.get_position()
+                #     self.server.send_data(loc)
 
         if self.server.connected:
             mouse_thread = threading.Thread(target=listen_to_mouse)

@@ -31,9 +31,6 @@ class ClientWindow(QMainWindow):
             self.screen_ratio = self.client.receive_screen_dims()
             self.start()
 
-        # def on_disconnect():
-        #
-
         self.client.__init__()
         connect = threading.Thread(
             target=lambda: self.client.connect_now(on_connect, status_change)
@@ -46,11 +43,11 @@ class ClientWindow(QMainWindow):
         connect.start()
 
     def start(self):
-        mouse_thread = threading.Thread(target=self.listen_for_mouse_events())
+        mouse_thread = threading.Thread(target=self.receive_mouse_events())
         mouse_thread.daemon = True
         mouse_thread.start()
 
-    def listen_for_mouse_events(self):
+    def receive_mouse_events(self):
         while not self.controller.is_set():
             data = self.client.receive()
 
@@ -67,20 +64,23 @@ class ClientWindow(QMainWindow):
 
     def handle_mouse_event(self, data):
         """ Mouse event handler """
-        button, x, y = data.split(",")
+        # button, x, y, t = data.split(",")
 
         # Perform mouse action based on button value
-        if button == "MoveEvent":
+        if data.__contains__("Move"):
+            button, x, y, t = data.split(",")
             x = int(x) * self.screen_ratio
             y = int(y) * self.screen_ratio
-            mouse.play([mouse.MoveEvent(x=x, y=y, time=0)], 0)
-        elif button == "ButtonEvent":
+            mouse.play([mouse.MoveEvent(x=x, y=y, time=t)], 0)
+        elif data.__contains__("Button"):
+            button, x, y, t = data.split(",")
             try:
-                mouse.play([mouse.ButtonEvent(event_type=x.strip(), button=y.strip(), time=0)], 0)
+                mouse.play([mouse.ButtonEvent(event_type=x.strip(), button=y.strip(), time=t)], 0)
             except Exception as e:
                 print(e)
         else:
+            button, delta, t = data.split(",")
             try:
-                mouse.play([mouse.WheelEvent(delta=x.strip(), time=y.strip())])
+                mouse.play([mouse.WheelEvent(delta=delta.strip(), time=t.strip())])
             except Exception as e:
                 print(e)
