@@ -3,6 +3,7 @@ import threading
 import mouse
 from PyQt6.QtWidgets import QMainWindow, QPushButton
 
+from Application.EventListeners.keyboard_events import key_press_performer
 from Application.EventListeners.mouse_events import mouse_event_performer
 from Application.Networking.client import Client
 
@@ -17,7 +18,6 @@ class ClientWindow(QMainWindow):
         self.switch.clicked.connect(self.connect)
 
         self.controller = threading.Event()
-        # self.connecting = threading.Event()
 
         self.client = Client()
         self.screen_ratio = 1
@@ -59,4 +59,7 @@ class ClientWindow(QMainWindow):
             all_data = data.split(";")
             for entry in all_data:
                 if not entry == "":
-                    mouse_event_performer(entry, self.screen_ratio)
+                    if entry.__contains__("keyboard"):
+                        key_press_performer(entry)
+                    else:
+                        mouse_event_performer(entry, self.screen_ratio)

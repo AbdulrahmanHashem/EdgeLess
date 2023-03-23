@@ -4,6 +4,7 @@ import mouse
 from PyQt6 import QtWidgets
 from PyQt6.QtCore import Qt
 
+from Application.EventListeners.keyboard_events import listen_for_all_keys
 from Application.EventListeners.mouse_events import listen_to_all_clicks_and_wheel
 from Application.Networking.server import Server
 
@@ -69,6 +70,8 @@ class ServerWindow(QtWidgets.QMainWindow):
         def listen_to_mouse():
             while not self.controller.is_set():
                 listen_to_all_clicks_and_wheel(self.server.send_data, self.mouse_loc, update_mouse_loc)
+
+                listen_for_all_keys(self.server.send_data)
                 self.controller.wait()
                 # if loc is not None:
                 #     self.mouse_loc = mouse.get_position()

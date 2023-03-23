@@ -15,7 +15,6 @@ class Client(socket.socket):
     def connect_now(self, on_connect: (), status_change: ()):
         """ connects to the given server full address """
         try:
-            # self.settimeout(5)
             print(f"Attempting to connect to {self.SERVER_HOST}, {self.SERVER_PORT}")
             status_change("Connecting")
             self.connect((self.SERVER_HOST, self.SERVER_PORT))
@@ -34,12 +33,14 @@ class Client(socket.socket):
         return c_size.width() / int(s_size.split(",")[0])
 
     def receive(self) -> str:
-        data: str = self.recv(self.BUFFER_SIZE).decode()
-        if not data:  # No data received means the client has disconnected
-            return ""
+        try:
+            data: str = self.recv(self.BUFFER_SIZE).decode()
+            if not data:  # No data received means the client has disconnected
+                return ""
 
-        # print(data)
-        return data
+            return data
+        except Exception as e:
+            print(e)
 
     def disconnect(self, on_disconnect: ()):
         try:
