@@ -1,6 +1,6 @@
 import threading
 
-import mouse
+import keyboard
 from PyQt6 import QtWidgets
 from PyQt6.QtCore import Qt
 
@@ -32,6 +32,10 @@ class ServerWindow(QtWidgets.QMainWindow):
         self.mouse_loc = (0, 0)
         self.controller = threading.Event()
 
+        keyboard.add_hotkey("ctrl+shift", self.on_switch)
+
+    def on_switch(self):
+        pass
     def toggle_server(self) -> None:
         if self.start.text() == "Start Server":
             self.server.__init__()
