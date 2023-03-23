@@ -1,9 +1,8 @@
 import mouse
 
 
-""" listeners """
-
 def listen_to_all_clicks_and_wheel(send, cxy, update_mouse_loc):
+    """ Mouse event listener """
     def on_event(event):
         # print(event)
         if isinstance(event, mouse.ButtonEvent):
@@ -18,11 +17,8 @@ def listen_to_all_clicks_and_wheel(send, cxy, update_mouse_loc):
     mouse.hook(on_event)
 
 
-""" mouse event executors """
-
-
 def mouse_event_performer(data, screen_ratio):
-    """ Mouse event handler """
+    """ Mouse event executor """
     try:
         if data.__contains__("Move"):
             button, x, y, t = data.split(",")

@@ -1,6 +1,6 @@
 import sys
-from PyQt6.QtWidgets import QApplication
 
+from PyQt6.QtWidgets import QApplication
 from Application.UserInterface.ClientUI import ClientWindow
 from Application.UserInterface.ServerUI import ServerWindow
 

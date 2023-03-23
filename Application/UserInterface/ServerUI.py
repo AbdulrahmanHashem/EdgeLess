@@ -1,9 +1,8 @@
 import threading
-
 import keyboard
+
 from PyQt6 import QtWidgets
 from PyQt6.QtCore import Qt
-
 from Application.EventListeners.keyboard_events import listen_for_all_keys
 from Application.EventListeners.mouse_events import listen_to_all_clicks_and_wheel
 from Application.Networking.server import Server
@@ -36,6 +35,7 @@ class ServerWindow(QtWidgets.QMainWindow):
 
     def on_switch(self):
         pass
+
     def toggle_server(self) -> None:
         if self.start.text() == "Start Server":
             self.server.__init__()
@@ -71,7 +71,7 @@ class ServerWindow(QtWidgets.QMainWindow):
         def update_mouse_loc(xy):
             self.mouse_loc = xy
 
-        def listen_to_mouse():
+        def listen_to_controls():
             while not self.controller.is_set():
                 listen_to_all_clicks_and_wheel(self.server.send_data, self.mouse_loc, update_mouse_loc)
 
@@ -79,7 +79,7 @@ class ServerWindow(QtWidgets.QMainWindow):
                 self.controller.wait()
 
         if self.server.connected:
-            mouse_thread = threading.Thread(target=listen_to_mouse)
+            mouse_thread = threading.Thread(target=listen_to_controls)
             mouse_thread.daemon = True
             try:
                 mouse_thread.start()

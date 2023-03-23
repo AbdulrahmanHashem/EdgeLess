@@ -4,6 +4,7 @@ import threading
 import mouse
 import pyautogui
 
+
 class Server(socket.socket):
     def __init__(self, fam=socket.AF_INET, ty=socket.SOCK_STREAM):
         super().__init__(fam, ty)

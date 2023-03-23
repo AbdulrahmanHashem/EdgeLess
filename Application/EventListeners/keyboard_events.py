@@ -1,6 +1,8 @@
 import keyboard
 
+
 def listen_for_all_keys(send):
+    """ Keyboard Key Events Listener """
     def on_key(event: keyboard.KeyboardEvent):
         send(f"keyboard,{event.event_type},{event.scan_code},{event.name},{event.time},{event.device},{event.modifiers},{event.is_keypad};")
 
@@ -8,6 +10,7 @@ def listen_for_all_keys(send):
 
 
 def key_press_performer(data, last_time, update_last_time):
+    """ Keyboard Key Events executor """
     try:
         event, event_type, scan_code, name, time, device, modifiers, is_keypad = data.split(",")
         if not last_time == float(time):
