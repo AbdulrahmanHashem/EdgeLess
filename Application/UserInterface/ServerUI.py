@@ -73,9 +73,6 @@ class ServerWindow(QtWidgets.QMainWindow):
 
                 listen_for_all_keys(self.server.send_data)
                 self.controller.wait()
-                # if loc is not None:
-                #     self.mouse_loc = mouse.get_position()
-                #     self.server.send_data(loc)
 
         if self.server.connected:
             mouse_thread = threading.Thread(target=listen_to_mouse)

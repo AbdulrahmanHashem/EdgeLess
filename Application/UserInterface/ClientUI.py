@@ -21,6 +21,10 @@ class ClientWindow(QMainWindow):
 
         self.client = Client()
         self.screen_ratio = 1
+        self.last_time = 0.0
+
+    def update_last_time(self, last_time):
+        self.last_time = last_time
 
     def connect(self):
         def status_change(status_string: str):
@@ -51,15 +55,15 @@ class ClientWindow(QMainWindow):
     def receive_mouse_events(self):
         while not self.controller.is_set():
             data = self.client.receive()
+            if data:
+                if data.strip().__contains__("clo"):
+                    self.client.send("ok")
+                    self.client.disconnect(lambda: self.switch.setText("Connect"))
 
-            if data.strip().__contains__("clo"):
-                self.client.send("ok")
-                self.client.disconnect(lambda: self.switch.setText("Connect"))
-
-            all_data = data.split(";")
-            for entry in all_data:
-                if not entry == "":
-                    if entry.__contains__("keyboard"):
-                        key_press_performer(entry)
-                    else:
-                        mouse_event_performer(entry, self.screen_ratio)
+                all_data = data.split(";")
+                for entry in all_data:
+                    if not entry == "":
+                        if entry.__contains__("keyboard"):
+                            key_press_performer(entry, self.last_time, self.update_last_time)
+                        else:
+                            mouse_event_performer(entry, self.screen_ratio)

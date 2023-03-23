@@ -10,7 +10,7 @@ class Server(socket.socket):
     def __init__(self, fam=socket.AF_INET, ty=socket.SOCK_STREAM):
         super().__init__(fam, ty)
         # Global constants
-        self.HOST = socket.gethostbyname_ex(socket.gethostname())[2][3]  # Use all available interfaces
+        self.HOST = "192.168.1.100"  # Use all available interfaces
         self.PORT = 9999  # Arbitrary non-privileged port
         self.BUFFER_SIZE = 1024
         self.connected = False
@@ -55,6 +55,7 @@ class Server(socket.socket):
             print(e)
         print("disconnected")
         self.connected = False
+        self.stop()
 
     def stop(self):
         mouse.unhook_all()
