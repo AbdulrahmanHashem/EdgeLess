@@ -1,6 +1,9 @@
 import threading
 
+import keyboard
 from PyQt6.QtWidgets import QMainWindow, QPushButton
+from keyboard._winkeyboard import official_virtual_keys
+
 from Application.EventListeners.keyboard_events import key_press_performer
 from Application.EventListeners.mouse_events import mouse_event_performer
 from Application.Networking.client import Client
@@ -39,7 +42,7 @@ class ClientWindow(QMainWindow):
             if
             self.switch.text() == "Connect"
             else
-            self.client.disconnect(lambda: self.switch.setText("Connect"))
+            self.client.disconnect()
         )
         connect.daemon = True
         connect.start()
@@ -55,6 +58,9 @@ class ClientWindow(QMainWindow):
             if data:
                 if data.strip().__contains__("clo"):
                     self.client.disconnect()
+                elif data.strip().__contains__("new"):
+                    for key in official_virtual_keys:
+                        keyboard.release(key)
 
                 all_data = data.split(";")
                 for entry in all_data:

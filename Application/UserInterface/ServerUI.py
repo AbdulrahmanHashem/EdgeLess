@@ -3,7 +3,8 @@ import keyboard
 
 from PyQt6 import QtWidgets
 from PyQt6.QtCore import Qt
-from Application.EventListeners.keyboard_events import listen_for_all_keys
+
+from Application.EventListeners.keyboard_events import KeyboardHandler
 from Application.EventListeners.mouse_events import listen_to_all_clicks_and_wheel
 from Application.Networking.server import Server
 
@@ -31,10 +32,8 @@ class ServerWindow(QtWidgets.QMainWindow):
         self.mouse_loc = (0, 0)
         self.controller = threading.Event()
 
-        keyboard.add_hotkey("ctrl+shift", self.on_switch)
-
-    def on_switch(self):
-        pass
+        self.keyboard_handler = KeyboardHandler(self)
+        keyboard.add_hotkey("ctrl+shift", self.keyboard_handler.on_switch)
 
     def toggle_server(self) -> None:
         if self.start.text() == "Start Server":
@@ -75,7 +74,7 @@ class ServerWindow(QtWidgets.QMainWindow):
             while not self.controller.is_set():
                 listen_to_all_clicks_and_wheel(self.server.send_data, self.mouse_loc, update_mouse_loc)
 
-                listen_for_all_keys(self.server.send_data)
+                # listen_for_all_keys(self.server.send_data)
                 self.controller.wait()
 
         if self.server.connected:
