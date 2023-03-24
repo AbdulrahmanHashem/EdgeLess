@@ -39,6 +39,7 @@ class Client(socket.socket):
             return data
         except Exception as e:
             print(e)
+            self.disconnect()
 
     def disconnect(self):
         try:
@@ -50,3 +51,5 @@ class Client(socket.socket):
         self.close()
 
         self.context.update_status_change("Connect")
+        self.context.controller.set()
+

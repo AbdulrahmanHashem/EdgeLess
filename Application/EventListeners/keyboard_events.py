@@ -13,7 +13,12 @@ class KeyboardHandler:
         def event_handler(event: keyboard.KeyboardEvent):
             if self.session_start:
                 self.context.server.send_data("new session")
+                self.session_start = False
             self.context.server.send_data(f"keyboard,{event.event_type},{event.scan_code},{event.name},{event.time},{event.device},{event.modifiers},{event.is_keypad};")
+
+            # if event.name == "left alt":
+            # print(f"keyboard,{event.event_type},{event.scan_code},{event.name},{event.time},{event.device},{event.modifiers},{event.is_keypad};")
+
             if event.name == "shift" and self.last_pressed == "ctrl":
                 self.on_switch()
             self.last_pressed = event.name
