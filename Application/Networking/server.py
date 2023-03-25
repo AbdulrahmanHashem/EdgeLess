@@ -6,12 +6,14 @@ import pyautogui
 
 
 class Server(socket.socket):
-    def __init__(self, fam=socket.AF_INET, ty=socket.SOCK_STREAM):
+    def __init__(self, context, fam=socket.AF_INET, ty=socket.SOCK_STREAM):
         super().__init__(fam, ty)
         # Global constants
         self.HOST = "192.168.1.100"  # Use all available interfaces
         self.PORT = 9999  # Arbitrary non-privileged port
         self.BUFFER_SIZE = 1024
+        self.context = context
+
         self.connected = False
 
         self.client_socket = None
@@ -30,15 +32,23 @@ class Server(socket.socket):
             print(e)
             return False
 
-    def connect_now(self, on_connected):
+    def connect_now(self):
         """ Wait for client to connect """
         try:
+            # Wait incoming connection and accept it
             self.client_socket, self.client_address = self.accept()
+
+            # Send screen dimensions to client
             SCREEN_WIDTH, SCREEN_HEIGHT = pyautogui.size()
-            self.client_socket.sendall(f"{SCREEN_WIDTH},{SCREEN_HEIGHT}".encode())  # Send screen dimensions to client
+            self.client_socket.sendall(f"{SCREEN_WIDTH},{SCREEN_HEIGHT}".encode())
+
             print(f"Client {self.client_address[0]}:{self.client_address[1]} is connected.")
+
+            # Update server connection state
             self.connected = True
-            on_connected()
+
+            # Update UI
+            self.context.on_connected()
         except Exception as e:
             print(e)
 

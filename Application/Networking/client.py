@@ -26,9 +26,12 @@ class Client(socket.socket):
         self.context.update_status_change("Connect")
 
     def receive_screen_dims(self) -> int:
-        s_size = self.recv(self.BUFFER_SIZE).decode()
-        c_size = QGuiApplication.primaryScreen().availableGeometry()
-        return c_size.width() / int(s_size.split(",")[0])
+        try:
+            s_size = self.recv(self.BUFFER_SIZE).decode()
+            c_size = QGuiApplication.primaryScreen().availableGeometry()
+            return c_size.width() / int(s_size.split(",")[0])
+        except Exception as e:
+            print("Screen Setup : ", e)
 
     def receive(self) -> str:
         try:
@@ -46,7 +49,7 @@ class Client(socket.socket):
             self.getpeername()
             self.shutdown(socket.SHUT_RDWR)
         except Exception as e:
-            print("Socket Not Connected")
+            print(f"Socket Not Connected or {e}")
 
         self.close()
 
