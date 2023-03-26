@@ -20,7 +20,8 @@ class MouseHandler:
 
     def on_click(self, x, y, button, down):
         print(f"ButtonEvent,{button},{down};")
-        self.context.server.send_data(f"ButtonEvent,{str(Button).strip('Button.')},{'down' if down else 'up'};")
+        down = 'down' if down else 'up'
+        self.context.server.send_data(f"ButtonEvent,{str(Button).strip('Button.')},{down};")
         return True
 
     def on_scroll(self, x, y, is_h, delta):
