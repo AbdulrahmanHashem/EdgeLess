@@ -1,7 +1,8 @@
 import threading
 
 import keyboard
-from PyQt6.QtWidgets import QMainWindow, QPushButton
+from PyQt6 import QtWidgets
+from PyQt6.QtCore import Qt
 from keyboard._winkeyboard import official_virtual_keys
 
 from Application.EventListeners.keyboard_events import key_press_performer
@@ -9,62 +10,98 @@ from Application.EventListeners.mouse_events import mouse_event_performer
 from Application.Networking.client import Client
 
 
-class ClientWindow(QMainWindow):
+class ClientWindow(QtWidgets.QMainWindow):
+    def setup_ui(self):
+        main_widget = QtWidgets.QWidget()
+        v_layout = QtWidgets.QVBoxLayout(main_widget)
+        self.setCentralWidget(main_widget)
+
+        self.state = QtWidgets.QLabel("")
+        v_layout.addWidget(self.state, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        self.switch = QtWidgets.QPushButton("Connect")
+        v_layout.addWidget(self.switch, alignment=Qt.AlignmentFlag.AlignCenter)
+
+    def on_connected(self, new):
+        if new is None:
+            self.switch.setText("Connecting")
+            self.state.setText(f"Attempting to connect to {self.client.CLIENT_HOST}, {self.client.CLIENT_PORT}")
+        elif new:
+            self.switch.setText("Disconnect")
+            self.screen_ratio = self.client.receive_screen_dims()
+            self.state.setText(f"{self.client.CLIENT_HOST} : {self.client.CLIENT_PORT}")
+
+            self.start_session()
+        else:
+            self.switch.setText("Connect")
+            self.state.setText(f"")
+
+            self.stop_session()
+
     def __init__(self):
         super().__init__()
-        self.switch = QPushButton()
-        self.setCentralWidget(self.switch)
-        self.switch.setText("Connect")
+        self.setup_ui()
 
-        self.switch.clicked.connect(self.connect)
+        self.switch.clicked.connect(self.toggle)
 
         self.controller = threading.Event()
+        self.mouse_thread = None
+        self.connecting_thread = None
 
         self.client = Client(self)
+
         self.screen_ratio = 1
         self.last_time = 0.0
 
     def update_last_time(self, last_time):
         self.last_time = last_time
 
-    def update_status_change(self, status_string: str):
-        self.switch.setText(status_string)
-
-    def on_connect(self):
-        self.switch.setText("Disconnect")
-        self.screen_ratio = self.client.receive_screen_dims()
-        self.start()
+    def toggle(self):
+        if self.client.connected.value is False:
+            self.controller.clear()
+            self.connect()
+        else:
+            self.controller.set()
+            self.disconnect()
 
     def connect(self):
         self.client.__init__(self)
-        connect = threading.Thread(
-            target=lambda: self.client.connect_now()
-            if
-            self.switch.text() == "Connect"
-            else
-            self.client.disconnect()
-        )
-        connect.daemon = True
-        connect.start()
+        self.connecting_thread = threading.Thread(target=self.client.connect_now)
+        self.connecting_thread.start()
 
-    def start(self):
-        mouse_thread = threading.Thread(target=self.receive_control_events)
-        mouse_thread.daemon = True
-        mouse_thread.start()
+    def disconnect(self):
+        self.client.disconnect()
+        self.connecting_thread.join()
+        self.connecting_thread = None
+
+    def start_session(self):
+        if self.mouse_thread is None:
+            self.mouse_thread = threading.Thread(target=self.receive_control_events)
+            try:
+                self.mouse_thread.start()
+            except Exception as e:
+                print(f"Start Catch : {e}")
+        else:
+            print(f"Start Error")
+
+    def stop_session(self):
+        self.mouse_thread.join()
+        self.mouse_thread = None
 
     def receive_control_events(self):
         while not self.controller.is_set():
             data = self.client.receive()
             if data:
-                if data.strip().__contains__("clo") or data.strip().__contains__("new"):
-                    self.client.disconnect()
+                if data.__contains__("clo"):
+                    self.disconnect()
+                elif data.__contains__("new"):
                     for key in official_virtual_keys:
                         keyboard.release(key)
 
-                all_data = data.split(";")
-                for entry in all_data:
-                    if not entry == "":
-                        if entry.__contains__("keyboard"):
-                            key_press_performer(entry, self.last_time, self.update_last_time)
+                events = data.split(";")
+                for event in events:
+                    if not event == "":
+                        if event.__contains__("keyboard"):
+                            key_press_performer(event, self.last_time, self.update_last_time)
                         else:
-                            mouse_event_performer(entry, self.screen_ratio)
+                            mouse_event_performer(event, self.screen_ratio)
