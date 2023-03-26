@@ -56,9 +56,8 @@ class ClientWindow(QMainWindow):
         while not self.controller.is_set():
             data = self.client.receive()
             if data:
-                if data.strip().__contains__("clo"):
+                if data.strip().__contains__("clo") or data.strip().__contains__("new"):
                     self.client.disconnect()
-                elif data.strip().__contains__("new"):
                     for key in official_virtual_keys:
                         keyboard.release(key)
 
