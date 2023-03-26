@@ -1,5 +1,5 @@
 import mouse
-from pynput.mouse import Listener
+from pynput.mouse import Listener, Button
 
 
 class MouseHandler:
@@ -19,7 +19,8 @@ class MouseHandler:
         self.listener.stop()
 
     def on_click(self, x, y, button, down):
-        self.context.server.send_data(f"ButtonEvent,{button},{down};")
+        print(f"ButtonEvent,{button},{down};")
+        self.context.server.send_data(f"ButtonEvent,{str(Button).strip('Button.')},{'down' if down else 'up'};")
         return True
 
     def on_scroll(self, x, y, is_h, delta):
@@ -36,24 +37,24 @@ def mouse_event_performer(data, screen_ratio):
     """ Mouse event executor """
     try:
         if data.__contains__("Move"):
-            button, x, y = data.split(",")
+            event, x, y = data.split(",")
             mouse.play([mouse.MoveEvent(
                 x=int(x) * screen_ratio,
                 y=int(y) * screen_ratio,
                 time=0)], 0)
 
         elif data.__contains__("Button"):
-            button, x, y = data.split(",")
+            event, button, down = data.split(",")
             try:
                 mouse.play([mouse.ButtonEvent(
-                    event_type=x.strip(),
-                    button=y.strip(),
+                    event_type=down.strip(),
+                    button=button.strip(),
                     time=0)], 0)
             except Exception as e:
                 print(e)
 
         else:
-            button, is_h, delta = data.split(",")
+            event, is_h, delta = data.split(",")
             try:
                 mouse.play([mouse.WheelEvent(
                     delta=float(delta.strip()),
