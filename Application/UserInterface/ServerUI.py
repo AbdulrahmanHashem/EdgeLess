@@ -85,7 +85,7 @@ class ServerWindow(QtWidgets.QMainWindow):
     def start_session(self) -> None:
         def listen_to_controls():
             self.keyboard_handler.start_keyboard()
-            self.mouse_handler.start_mouse()
+            # self.mouse_handler.start_mouse()
             while not self.controller.is_set():
                 pass
 

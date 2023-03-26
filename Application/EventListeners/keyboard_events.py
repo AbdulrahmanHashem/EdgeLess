@@ -35,7 +35,7 @@ class KeyboardHandler:
 
         if event.name == "shift" and self.last_pressed == "ctrl":
             self.stop_keyboard()
-            self.context.mouse_handler.stop_mouse()
+            # self.context.mouse_handler.stop_mouse()
             keyboard.add_hotkey("ctrl+shift", self.context.start_session)
 
         self.last_pressed = event.name
