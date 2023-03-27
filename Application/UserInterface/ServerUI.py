@@ -57,7 +57,6 @@ class ServerWindow(QtWidgets.QMainWindow):
         self.mouse_handler = MouseHandler(self)
         self.mouse_loc = (0, 0)
 
-        # self.controller = threading.Event()
         self.session = threading.Event()
         self.session.set()
 

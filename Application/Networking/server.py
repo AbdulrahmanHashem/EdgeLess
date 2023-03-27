@@ -76,8 +76,6 @@ class Server(socket.socket):
             else:
                 if data != "close":
                     print("Sending Data Error : Socket Is Not Connected or It's Destroyed")
-                # self.connected.value = False
-                # self.stop()
         except Exception as e:
             print(f"Sending Data Catch : {e}")
             if self.connected.value:
