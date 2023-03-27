@@ -22,13 +22,15 @@ class Client(socket.socket):
         try:
             self.connected.value = None
             self.connect((self.CLIENT_HOST, self.CLIENT_PORT))
+
+            self.context.screen_ratio = self.receive_screen_dims()
+
             self.connected.value = True
             return
-        except socket.timeout as timeout:
-            print(timeout)
         except Exception as e:
-            print(f"Connect Now Catch : {e}")
-        self.connected.value = False
+            print(f"Connect Now Catch : {e}"
+                  f"\n      You Likely Stopped the Client Before a Successful Connection")
+            self.connected.value = False
 
     def receive_screen_dims(self) -> int:
         try:
@@ -51,7 +53,8 @@ class Client(socket.socket):
 
     def disconnect(self):
         try:
-            self.shutdown(socket.SHUT_RDWR)
+            if self.connected.value:
+                self.shutdown(socket.SHUT_RDWR)
         except Exception as e:
             print(f"Disconnect Shutdown Catch : {e}")
 

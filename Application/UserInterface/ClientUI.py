@@ -28,7 +28,6 @@ class ClientWindow(QtWidgets.QMainWindow):
             self.state.setText(f"Attempting to connect to {self.client.CLIENT_HOST}, {self.client.CLIENT_PORT}")
         elif new:
             self.switch.setText("Disconnect")
-            self.screen_ratio = self.client.receive_screen_dims()
             self.state.setText(f"{self.client.CLIENT_HOST} : {self.client.CLIENT_PORT}")
 
             self.start_session()
@@ -36,7 +35,7 @@ class ClientWindow(QtWidgets.QMainWindow):
             self.switch.setText("Connect")
             self.state.setText(f"")
 
-            self.stop_session()
+            # self.stop_session()
 
     def __init__(self):
         super().__init__()
@@ -45,6 +44,8 @@ class ClientWindow(QtWidgets.QMainWindow):
         self.switch.clicked.connect(self.toggle)
 
         self.controller = threading.Event()
+        self.controller.set()
+
         self.mouse_thread = None
         self.connecting_thread = None
 
@@ -58,24 +59,33 @@ class ClientWindow(QtWidgets.QMainWindow):
 
     def toggle(self):
         if self.client.connected.value is False:
-            self.controller.clear()
             self.connect()
         else:
-            self.controller.set()
             self.disconnect()
 
     def connect(self):
         self.client.__init__(self)
-        self.connecting_thread = threading.Thread(target=self.client.connect_now)
-        self.connecting_thread.start()
+        if self.connecting_thread is None:
+            self.connecting_thread = threading.Thread(target=self.client.connect_now)
+            self.connecting_thread.start()
 
     def disconnect(self):
+        self.end_session()
+
         self.client.disconnect()
-        self.connecting_thread.join()
+        if self.connecting_thread.is_alive():
+            self.connecting_thread.join()
         self.connecting_thread = None
+
+    # def toggle_session(self):
+    #     if self.controller.is_set():
+    #         self.start_session()
+    #     else:
+    #         self.end_session()
 
     def start_session(self):
         if self.mouse_thread is None:
+            self.controller.clear()
             self.mouse_thread = threading.Thread(target=self.receive_control_events)
             try:
                 self.mouse_thread.start()
@@ -84,9 +94,14 @@ class ClientWindow(QtWidgets.QMainWindow):
         else:
             print(f"Start Error")
 
-    def stop_session(self):
-        self.mouse_thread.join()
-        self.mouse_thread = None
+    def end_session(self):
+        try:
+            self.controller.set()
+            if self.mouse_thread is not None and self.mouse_thread.is_alive():
+                self.mouse_thread.join()
+            self.mouse_thread = None
+        except Exception as e:
+            print(f"End Session Catch : {e}")
 
     def receive_control_events(self):
         while not self.controller.is_set():

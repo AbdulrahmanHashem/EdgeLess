@@ -80,7 +80,8 @@ class Server(socket.socket):
                 # self.stop()
         except Exception as e:
             print(f"Sending Data Catch : {e}")
-            self.context.disconnect()
+            if self.connected.value:
+                self.context.disconnect()
 
     def stop(self):
         try:

@@ -146,7 +146,7 @@ class ServerWindow(QtWidgets.QMainWindow):
 
             self.session.set()  # stop session loops
 
-            if self.mouse_thread.is_alive():
+            if self.mouse_thread is not None and self.mouse_thread.is_alive():
                 self.mouse_thread.join()
             self.mouse_thread = None
             print("Session End")
