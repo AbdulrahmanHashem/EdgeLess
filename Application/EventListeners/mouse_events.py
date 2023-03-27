@@ -11,17 +11,15 @@ class MouseHandler:
         self.listener.daemon = True
 
     def start_mouse(self):
-        print("started")
         self.listener.run()
 
     def stop_mouse(self):
-        print("stopped")
         self.listener.stop()
 
     def on_click(self, x, y, button, down):
-        print(f"ButtonEvent,{button},{down};")
         down = 'down' if down else 'up'
-        self.context.server.send_data(f"ButtonEvent,{str(Button).strip('Button.')},{down};")
+        button = str(button)[7:]
+        self.context.server.send_data(f"ButtonEvent,{button},{down};")
         return True
 
     def on_scroll(self, x, y, is_h, delta):

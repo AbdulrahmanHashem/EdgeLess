@@ -11,19 +11,13 @@ class KeyboardHandler:
         self.session_start = True
 
     def start_keyboard(self):
-        self.context.controller.clear()
-
         for key in official_virtual_keys:
             self.blocked_keys[official_virtual_keys[key][0]] = \
                 keyboard.hook_key(official_virtual_keys[key][0], self.key_handler, suppress=True)
-            keyboard.release(key)
-        print("ON")
+            # keyboard.release(key)
 
     def stop_keyboard(self):
-        self.context.controller.set()
         keyboard.unhook_all()
-        self.__init__(self.context)
-        print("OFF")
 
     def key_handler(self, event: keyboard.KeyboardEvent):
         if self.session_start:
@@ -34,9 +28,8 @@ class KeyboardHandler:
             send_data(f"keyboard,{event.event_type},{event.scan_code},{event.name},{event.time},{event.device},{event.modifiers},{event.is_keypad};")
 
         if event.name == "shift" and self.last_pressed == "ctrl":
-            self.stop_keyboard()
-            # self.context.mouse_handler.stop_mouse()
-            keyboard.add_hotkey("ctrl+shift", self.context.start_session)
+            self.context.toggle_session()
+            keyboard.add_hotkey("ctrl+shift", self.context.toggle_session)
 
         self.last_pressed = event.name
 

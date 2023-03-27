@@ -1,5 +1,6 @@
 import socket
 import threading
+from inspect import Traceback
 
 import mouse
 import pyautogui
@@ -16,7 +17,6 @@ class Server(socket.socket):
     def __init__(self, context, fam=socket.AF_INET, ty=socket.SOCK_STREAM):
         super().__init__(fam, ty)
         self.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # Enable reuse of the same address
-
         self.context = context
 
         # connection state
@@ -26,32 +26,40 @@ class Server(socket.socket):
 
         self.client_socket = None
         self.client_address = None
+        self.last_sent = ""
 
     def run(self):
         try:
+            self.__init__(self.context)
             self.bind((self.HOST, self.PORT))  # bind the socket to a local address and port
             self.listen(1)  # Listen for one connection at a time only
-            self.connected.value = None
             return True
         except Exception as e:
-            print(f"Running Server : {e}")
+            print(f"Server Run Catch : {e}")
             return False
 
     def connect_now(self):
         """ Wait for client to connect """
         try:
             # Wait incoming connection and accept it
-            self.client_socket, self.client_address = self.accept()
-            print(self.client_socket)
-            print(f"Client {self.client_address[0]}:{self.client_address[1]} is connected.")
+            try:
+                self.connected.value = None
+                self.client_socket, self.client_address = self.accept()
+            except Exception as e:
+                print(f"Server 'Connect Now' Catch : {e}"
+                      f"\n      You Likely Stopped the Server Before a Successful Connection")
+                return None
 
-            self.send_screen_dims()
+            # print(self.client_socket)
+            print(f"Client {self.client_address[0]}:{self.client_address[1]} is connected.")
 
             # Update server connection state
             self.connected.value = True
+
+            self.send_screen_dims()
         except Exception as e:
             self.connected.value = False
-            print(f"Connecting Catch : {e}")
+            print(f"Server 'Connect Now' Unknown Catch : {e}")
 
     def send_screen_dims(self):
         # Send screen dimensions to client
@@ -61,15 +69,18 @@ class Server(socket.socket):
     def send_data(self, data: str):
         """ Mouse event handler """
         try:
-            if isinstance(self.client_socket, socket.socket):
+            if isinstance(self.client_socket, socket.socket) and self.connected.value:
                 self.client_socket.sendall(data.encode())
+                self.last_sent = data
                 return None
             else:
-                print("Sending Data Error : Socket Is Destroyed")
-                self.connected.value = False
-                self.stop()
+                if data != "close":
+                    print("Sending Data Error : Socket Is Not Connected or It's Destroyed")
+                # self.connected.value = False
+                # self.stop()
         except Exception as e:
             print(f"Sending Data Catch : {e}")
+            self.context.disconnect()
 
     def stop(self):
         try:
@@ -77,10 +88,12 @@ class Server(socket.socket):
                 # stop connection
                 self.shutdown(socket.SHUT_RDWR)
         except Exception as e:
-            print(f"Shutdown Catch : {e}")
+            if self.last_sent != "close":
+                print(f"Server Shutdown Catch : {e}")
 
         try:
             self.close()
             self.connected.value = False
+            print("Server Closed Gracefully")
         except Exception as e:
-            print(f"Close Catch: {e}")
+            print(f"Server Stop Catch: {e}")
