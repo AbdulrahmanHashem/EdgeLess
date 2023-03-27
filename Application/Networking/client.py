@@ -34,7 +34,7 @@ class Client(socket.socket):
 
     def receive_screen_dims(self) -> int:
         try:
-            s_size = self.recv(self.BUFFER_SIZE).decode()
+            s_size = self.receive()
             c_size = QGuiApplication.primaryScreen().availableGeometry()
             return c_size.width() / int(s_size.split(",")[0])
         except Exception as e:
@@ -48,7 +48,7 @@ class Client(socket.socket):
 
             return data
         except Exception as e:
-            print(e)
+            print(f"Receive Catch : {e}")
             # self.disconnect()
 
     def disconnect(self):
@@ -63,4 +63,5 @@ class Client(socket.socket):
         except Exception as e:
             print(f"Disconnect Close Catch : {e}")
 
-        self.connected.value = False
+        if self.connected.value is not False:
+            self.connected.value = False

@@ -35,8 +35,6 @@ class ClientWindow(QtWidgets.QMainWindow):
             self.switch.setText("Connect")
             self.state.setText(f"")
 
-            # self.stop_session()
-
     def __init__(self):
         super().__init__()
         self.setup_ui()
@@ -77,12 +75,6 @@ class ClientWindow(QtWidgets.QMainWindow):
             self.connecting_thread.join()
         self.connecting_thread = None
 
-    # def toggle_session(self):
-    #     if self.controller.is_set():
-    #         self.start_session()
-    #     else:
-    #         self.end_session()
-
     def start_session(self):
         if self.mouse_thread is None:
             self.controller.clear()
@@ -99,16 +91,16 @@ class ClientWindow(QtWidgets.QMainWindow):
             self.controller.set()
             if self.mouse_thread is not None and self.mouse_thread.is_alive():
                 self.mouse_thread.join()
-            self.mouse_thread = None
         except Exception as e:
             print(f"End Session Catch : {e}")
+        self.mouse_thread = None
 
     def receive_control_events(self):
         while not self.controller.is_set():
             data = self.client.receive()
             if data:
                 if data.__contains__("clo"):
-                    self.disconnect()
+                    self.controller.set()
                 elif data.__contains__("new"):
                     for key in official_virtual_keys:
                         keyboard.release(key)
