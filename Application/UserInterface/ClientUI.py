@@ -60,14 +60,16 @@ class ClientWindow(QtWidgets.QMainWindow):
 
     def toggle(self):
         if self.client.connected.value is False:
+            if self.client.client_disconnection is True:
+                self.mouse_thread.join()
+                self.client.client_disconnection = False
+
             self.connect()
         else:
             self.disconnect()
 
     def connect(self):
-        if self.client.client_disconnection is True:
-            self.mouse_thread.join()
-            self.client.client_disconnection = False
+
         self.client.__init__(self)
         self.connecting_thread = threading.Thread(target=self.client.connect_now)
         self.connecting_thread.start()

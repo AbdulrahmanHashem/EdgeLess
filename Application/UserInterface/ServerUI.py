@@ -53,7 +53,6 @@ class ServerWindow(QtWidgets.QMainWindow):
         super().__init__()
         self.setup_ui()
 
-        # make a server instance
         self.server = Server(self)
 
         self.keyboard_handler = KeyboardHandler(self)
@@ -61,8 +60,8 @@ class ServerWindow(QtWidgets.QMainWindow):
 
         self.session = threading.Event()
 
-        self.connect_thread: threading.Thread
-        self.mouse_thread: threading.Thread
+        self.connect_thread: threading.Thread | None = None
+        self.mouse_thread: threading.Thread | None = None
 
         self.start.clicked.connect(self.toggle_server)
 
@@ -108,7 +107,6 @@ class ServerWindow(QtWidgets.QMainWindow):
         self.keyboard_handler.stop_keyboard()
         self.mouse_handler.stop_mouse()
         self.session.set()
-        # keyboard.add_hotkey("ctrl+*", self.start_session)
 
     def start_session(self) -> None:
         if not self.server.connected.value:

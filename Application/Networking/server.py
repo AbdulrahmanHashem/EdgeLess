@@ -12,7 +12,7 @@ class Server(socket.socket):
     # Global constants
     HOST = "192.168.1.100"  # Use all available interfaces
     PORT = 9999  # Arbitrary non-privileged port
-    BUFFER_SIZE = 1024
+    BUFFER_SIZE = 1024 * 2
 
     def __init__(self, context, fam=socket.AF_INET, ty=socket.SOCK_STREAM):
         super().__init__(fam, ty)
