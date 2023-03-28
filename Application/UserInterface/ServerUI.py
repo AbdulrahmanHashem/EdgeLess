@@ -124,16 +124,6 @@ class ServerWindow(QtWidgets.QMainWindow):
         except Exception as e:
             print(f"Session Start Catch : {e}")
 
-    # def end_session(self):
-    #     try:
-    #         self.session.set()  # stop session loops
-    #
-    #         if self.mouse_thread.is_alive():
-    #             self.mouse_thread.join()
-    #         print("Session End")
-    #     except Exception as e:
-    #         print(f"End Session Catch : {e}")
-
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
         self.disconnect()
         super().closeEvent(a0)
