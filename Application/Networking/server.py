@@ -42,7 +42,6 @@ class Server(socket.socket):
     def connect_now(self):
         """ Wait for client to connect """
         try:
-            # Wait incoming connection and accept it
             try:
                 self.connected.value = None
                 self.client_socket, self.client_address = self.accept()
