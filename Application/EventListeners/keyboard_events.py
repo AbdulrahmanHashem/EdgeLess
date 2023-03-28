@@ -41,7 +41,7 @@ def key_press_performer(data, context):
             context.last_time = float(time)
             keyboard.send(name, True, False) if event_type == keyboard.KEY_DOWN else keyboard.send(name, False, True)
 
-            if name == "*" and context.ast_pressed == "ctrl":
+            if name == "*" and context.last_pressed == "ctrl":
                 keyboard.release("ctrl")
                 keyboard.release("*")
             context.last_pressed = name
