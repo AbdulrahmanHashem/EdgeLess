@@ -1,5 +1,4 @@
 import threading
-import time
 
 import keyboard
 import pyautogui

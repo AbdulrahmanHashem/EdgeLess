@@ -1,9 +1,4 @@
 import socket
-import threading
-from inspect import Traceback
-
-import mouse
-import pyautogui
 
 from Application.Utils.Observation import Observable
 
