@@ -1,5 +1,5 @@
 import mouse
-from pynput.mouse import Listener, Button
+from pynput.mouse import Listener
 
 
 class MouseHandler:
@@ -8,7 +8,6 @@ class MouseHandler:
         self.is_hooked = False
         self.listener: Listener | None = None
         self.listener = Listener(on_click=self.on_click, on_scroll=self.on_scroll, on_move=self.on_move, suppress=True)
-        self.listener.daemon = True
 
     def start_mouse(self):
         self.listener.run()

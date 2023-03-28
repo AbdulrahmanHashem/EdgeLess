@@ -51,6 +51,7 @@ class ClientWindow(QtWidgets.QMainWindow):
 
         self.screen_ratio = 1
         self.last_time = 0.0
+        self.last_pressed = ""
 
     def update_last_time(self, last_time):
         self.last_time = last_time
@@ -109,6 +110,6 @@ class ClientWindow(QtWidgets.QMainWindow):
                 for event in events:
                     if not event == "":
                         if event.__contains__("keyboard"):
-                            key_press_performer(event, self.last_time, self.update_last_time)
+                            key_press_performer(event, self)
                         else:
                             mouse_event_performer(event, self.screen_ratio)

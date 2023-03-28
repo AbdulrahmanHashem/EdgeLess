@@ -35,7 +35,7 @@ class ServerWindow(QtWidgets.QMainWindow):
                 "\n" +
                 str(self.server.client_address[0]) + " : " + str(self.server.client_address[1]))
 
-            keyboard.add_hotkey("ctrl+shift", self.toggle_session)
+            keyboard.add_hotkey("ctrl+*", self.toggle_session)
         else:
             self.address_port.setText("")
             self.start.setText("Start Server")
