@@ -1,8 +1,5 @@
 import socket
 
-import keyboard
-from PyQt6.QtGui import QGuiApplication
-
 from Application.Utils.Observation import Observable
 
 

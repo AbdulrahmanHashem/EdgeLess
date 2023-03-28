@@ -4,7 +4,6 @@ import keyboard
 from PyQt6 import QtWidgets, QtGui
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QGuiApplication
-from keyboard._winkeyboard import official_virtual_keys
 
 from Application.EventListeners.keyboard_events import key_press_performer
 from Application.EventListeners.mouse_events import mouse_event_performer
