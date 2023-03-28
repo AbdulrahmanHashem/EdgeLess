@@ -23,6 +23,10 @@ class ServerWindow(QtWidgets.QMainWindow):
         self.start = QtWidgets.QPushButton("Start Server")
         v_layout.addWidget(self.start, alignment=Qt.AlignmentFlag.AlignCenter)
 
+        self.reset = QtWidgets.QPushButton("Reset")
+        v_layout.addWidget(self.reset, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.reset.setEnabled(False)
+
     def on_connected(self, new):
         if new is None:
             self.address_port.setText(str(self.server.getsockname()))
@@ -64,6 +68,30 @@ class ServerWindow(QtWidgets.QMainWindow):
         self.mouse_thread = None
 
         self.start.clicked.connect(self.toggle_server)
+        self.reset.clicked.connect(self.reset_now)
+
+    def require_rest(self):
+        self.reset.setEnabled(True)
+        self.start.setEnabled(False)
+
+    def reset_now(self):
+        self.stop_listening_to_controls()
+        self.session.set()
+
+        if self.connect_thread is not None:
+            if self.connect_thread.is_alive():
+                self.connect_thread.join()
+            self.connect_thread = None
+
+        if self.mouse_thread is not None:
+            if self.mouse_thread.is_alive():
+                self.mouse_thread.join()
+            self.mouse_thread = None
+
+        self.server.connected.value = False
+
+        self.reset.setEnabled(False)
+        self.start.setEnabled(True)
 
     def update_mouse_loc(self, xy):
         self.mouse_loc = xy
@@ -76,10 +104,10 @@ class ServerWindow(QtWidgets.QMainWindow):
 
     def connect(self) -> None:
         if self.server.run():
-            # self.controller.clear()
-            # self.session.clear()
-
             if self.connect_thread is None:
+                if self.server.client_disconnect:
+                    self.session.clear()
+                self.server.client_disconnect = False
                 self.connect_thread = threading.Thread(target=self.server.connect_now)
                 try:
                     self.connect_thread.start()
@@ -95,23 +123,30 @@ class ServerWindow(QtWidgets.QMainWindow):
         try:
             self.end_session()
             if self.server.connected.value is not False:
-                # self.controller.set()
-                self.server.send_data("close")
+                if not self.session.is_set():
+                    self.session.set()
 
                 self.server.stop()
 
-                if self.connect_thread is not None and self.connect_thread.is_alive():
-                    self.connect_thread.join()
+                if self.server.client_disconnect is False:
+                    self.server.send_data("close")
 
-                self.connect_thread = None
+                    if self.connect_thread is not None and self.connect_thread.is_alive():
+                        self.connect_thread.join()
+
+                    self.connect_thread = None
         except Exception as e:
             print(f"Disconnect Catch : {e}")
 
     def toggle_session(self):
         if self.session.is_set():
+            self.start.setEnabled(False)
             self.start_session()
+            self.start.setEnabled(True)
         else:
+            self.start.setEnabled(False)
             self.end_session()
+            self.start.setEnabled(True)
 
     def start_listening_to_controls(self):
         self.keyboard_handler.start_keyboard()
@@ -120,8 +155,11 @@ class ServerWindow(QtWidgets.QMainWindow):
             pass
 
     def stop_listening_to_controls(self):
-        self.keyboard_handler.stop_keyboard()
-        self.mouse_handler.stop_mouse()
+        try:
+            self.keyboard_handler.stop_keyboard()
+            self.mouse_handler.stop_mouse()
+        except Exception as e:
+            print(f"Stop Listening Catch : {e}")
 
     def start_session(self) -> None:
         if not self.server.connected:
@@ -145,10 +183,11 @@ class ServerWindow(QtWidgets.QMainWindow):
 
             self.session.set()  # stop session loops
 
-            if self.mouse_thread is not None and self.mouse_thread.is_alive():
-                self.mouse_thread.join()
-            self.mouse_thread = None
-            print("Session End")
+            if self.server.client_disconnect is False:
+                if self.mouse_thread is not None and self.mouse_thread.is_alive():
+                    self.mouse_thread.join()
+                self.mouse_thread = None
+                print("Session End")
         except Exception as e:
             print(f"End Session Catch : {e}")
 

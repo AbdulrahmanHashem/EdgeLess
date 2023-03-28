@@ -17,6 +17,8 @@ class Client(socket.socket):
         self.connected.value = False
         self.connected.add_observer(self.context.on_connected)
 
+        self.host_disconnect = False
+
     def connect_now(self):
         """ connects to the given server full address """
         try:
@@ -44,9 +46,14 @@ class Client(socket.socket):
         try:
             data: str = self.recv(self.BUFFER_SIZE).decode()
             if not data:
+                self.context.toggle()
                 return ""
 
             return data
+        except socket.error:
+            print("Server Disconnected Shutdown Now")
+            self.context.disconnect()
+            self.connected.value = False
         except Exception as e:
             print(f"Receive Catch : {e}")
             # self.disconnect()

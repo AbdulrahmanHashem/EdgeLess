@@ -1,5 +1,6 @@
 import socket
 import threading
+import time
 from inspect import Traceback
 
 import mouse
@@ -19,6 +20,7 @@ class Server(socket.socket):
         self.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # Enable reuse of the same address
         self.context = context
 
+        self.client_disconnect = False
         # connection state
         self.connected = Observable()
         self.connected.value = False
@@ -76,6 +78,12 @@ class Server(socket.socket):
             else:
                 if data != "close":
                     print("Sending Data Error : Socket Is Not Connected or It's Destroyed")
+        except socket.error:
+            print("Server Disconnected Shutdown Now")
+            # self.context.session.set()
+            self.context.disconnect()
+            self.client_disconnect = True
+            self.context.require_rest()
         except Exception as e:
             print(f"Sending Data Catch : {e}")
             if self.connected.value:

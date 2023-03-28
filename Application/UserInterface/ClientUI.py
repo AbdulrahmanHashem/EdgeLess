@@ -39,10 +39,8 @@ class ClientWindow(QtWidgets.QMainWindow):
         super().__init__()
         self.setup_ui()
 
-        self.switch.clicked.connect(self.toggle)
-
-        self.controller = threading.Event()
-        self.controller.set()
+        self.session = threading.Event()
+        self.session.set()
 
         self.mouse_thread = None
         self.connecting_thread = None
@@ -52,6 +50,8 @@ class ClientWindow(QtWidgets.QMainWindow):
         self.screen_ratio = 1
         self.last_time = 0.0
         self.last_pressed = ""
+
+        self.switch.clicked.connect(self.toggle)
 
     def update_last_time(self, last_time):
         self.last_time = last_time
@@ -64,6 +64,12 @@ class ClientWindow(QtWidgets.QMainWindow):
 
     def connect(self):
         self.client.__init__(self)
+        if self.client.host_disconnect == True:
+            if self.mouse_thread is not None:
+                if self.mouse_thread.is_alive():
+                    self.mouse_thread.join()
+                self.mouse_thread = None
+
         if self.connecting_thread is None:
             self.connecting_thread = threading.Thread(target=self.client.connect_now)
             self.connecting_thread.start()
@@ -78,7 +84,7 @@ class ClientWindow(QtWidgets.QMainWindow):
 
     def start_session(self):
         if self.mouse_thread is None:
-            self.controller.clear()
+            self.session.clear()
             self.mouse_thread = threading.Thread(target=self.receive_control_events)
             try:
                 self.mouse_thread.start()
@@ -89,19 +95,19 @@ class ClientWindow(QtWidgets.QMainWindow):
 
     def end_session(self):
         try:
-            self.controller.set()
+            self.session.set()
             if self.mouse_thread is not None and self.mouse_thread.is_alive():
                 self.mouse_thread.join()
+            self.mouse_thread = None
         except Exception as e:
             print(f"End Session Catch : {e}")
-        self.mouse_thread = None
 
     def receive_control_events(self):
-        while not self.controller.is_set():
+        while not self.session.is_set():
             data = self.client.receive()
             if data:
                 if data.__contains__("clo"):
-                    self.controller.set()
+                    self.session.set()
                 elif data.__contains__("new"):
                     for key in official_virtual_keys:
                         keyboard.release(key)
