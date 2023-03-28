@@ -27,6 +27,7 @@ class Server(socket.socket):
         self.client_socket = None
         self.client_address = None
         self.last_sent = ""
+        self.client_disconnection = False
 
     def run(self):
         try:
@@ -45,50 +46,33 @@ class Server(socket.socket):
             try:
                 self.connected.value = None
                 self.client_socket, self.client_address = self.accept()
+                self.connected.value = True
+
             except Exception as e:
                 print(f"Server 'Connect Now' Catch : {e}"
                       f"\n      You Likely Stopped the Server Before a Successful Connection")
                 return None
 
-            # print(self.client_socket)
-            print(f"Client {self.client_address[0]}:{self.client_address[1]} is connected.")
-
-            # Update server connection state
-            self.connected.value = True
-
-            self.send_screen_dims()
         except Exception as e:
             self.connected.value = False
             print(f"Server 'Connect Now' Unknown Catch : {e}")
 
-    def send_screen_dims(self):
-        # Send screen dimensions to client
-        SCREEN_WIDTH, SCREEN_HEIGHT = pyautogui.size()
-        self.send_data(f"{SCREEN_WIDTH},{SCREEN_HEIGHT}")
-
     def send_data(self, data: str):
         """ Mouse event handler """
         try:
-            if isinstance(self.client_socket, socket.socket) and self.connected.value:
+            if self.connected.value:
                 self.client_socket.sendall(data.encode())
                 self.last_sent = data
-                return None
-            else:
-                if data != "close":
-                    print("Sending Data Error : Socket Is Not Connected or It's Destroyed")
-        except Exception as e:
-            print(f"Sending Data Catch : {e}")
-            if self.connected.value:
-                self.context.disconnect()
+        except socket.error as e:
+            print(f"Send Data Catch : {e}")
+            self.client_disconnection = True
+            self.context.disconnect()
 
     def stop(self):
         try:
-            if self.connected.value:
-                # stop connection
-                self.shutdown(socket.SHUT_RDWR)
+            self.shutdown(socket.SHUT_RDWR)
         except Exception as e:
-            if self.last_sent != "close":
-                print(f"Server Shutdown Catch : {e}")
+            print(f"Server Shutdown Catch : {e}")
 
         try:
             self.close()

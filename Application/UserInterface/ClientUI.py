@@ -1,8 +1,9 @@
 import threading
 
 import keyboard
-from PyQt6 import QtWidgets
+from PyQt6 import QtWidgets, QtGui
 from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QGuiApplication
 from keyboard._winkeyboard import official_virtual_keys
 
 from Application.EventListeners.keyboard_events import key_press_performer
@@ -26,11 +27,16 @@ class ClientWindow(QtWidgets.QMainWindow):
         if new is None:
             self.switch.setText("Connecting")
             self.state.setText(f"Attempting to connect to {self.client.CLIENT_HOST}, {self.client.CLIENT_PORT}")
+
         elif new:
+            s_size = self.client.receive()
+            self.screen_ratio = QGuiApplication.primaryScreen().availableGeometry().width() / int(s_size.split(",")[0])
+
             self.switch.setText("Disconnect")
             self.state.setText(f"{self.client.CLIENT_HOST} : {self.client.CLIENT_PORT}")
 
             self.start_session()
+
         else:
             self.switch.setText("Connect")
             self.state.setText(f"")
@@ -38,11 +44,6 @@ class ClientWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setup_ui()
-
-        self.switch.clicked.connect(self.toggle)
-
-        self.controller = threading.Event()
-        self.controller.set()
 
         self.mouse_thread = None
         self.connecting_thread = None
@@ -53,8 +54,9 @@ class ClientWindow(QtWidgets.QMainWindow):
         self.last_time = 0.0
         self.last_pressed = ""
 
-    def update_last_time(self, last_time):
-        self.last_time = last_time
+        self.controller = threading.Event()
+
+        self.switch.clicked.connect(self.toggle)
 
     def toggle(self):
         if self.client.connected.value is False:
@@ -63,49 +65,29 @@ class ClientWindow(QtWidgets.QMainWindow):
             self.disconnect()
 
     def connect(self):
+        if self.client.client_disconnection is True:
+            self.mouse_thread.join()
+            self.client.client_disconnection = False
         self.client.__init__(self)
-        if self.connecting_thread is None:
-            self.connecting_thread = threading.Thread(target=self.client.connect_now)
-            self.connecting_thread.start()
+        self.connecting_thread = threading.Thread(target=self.client.connect_now)
+        self.connecting_thread.start()
 
     def disconnect(self):
-        self.end_session()
-
+        self.controller.set()
         self.client.disconnect()
-        if self.connecting_thread.is_alive():
-            self.connecting_thread.join()
-        self.connecting_thread = None
 
     def start_session(self):
-        if self.mouse_thread is None:
+        try:
             self.controller.clear()
             self.mouse_thread = threading.Thread(target=self.receive_control_events)
-            try:
-                self.mouse_thread.start()
-            except Exception as e:
-                print(f"Start Catch : {e}")
-        else:
-            print(f"Start Error")
-
-    def end_session(self):
-        try:
-            self.controller.set()
-            if self.mouse_thread is not None and self.mouse_thread.is_alive():
-                self.mouse_thread.join()
+            self.mouse_thread.start()
         except Exception as e:
-            print(f"End Session Catch : {e}")
-        self.mouse_thread = None
+            print(f"Start Catch : {e}")
 
     def receive_control_events(self):
         while not self.controller.is_set():
             data = self.client.receive()
             if data:
-                if data.__contains__("clo"):
-                    self.controller.set()
-                elif data.__contains__("new"):
-                    for key in official_virtual_keys:
-                        keyboard.release(key)
-
                 events = data.split(";")
                 for event in events:
                     if not event == "":
@@ -113,3 +95,12 @@ class ClientWindow(QtWidgets.QMainWindow):
                             key_press_performer(event, self)
                         else:
                             mouse_event_performer(event, self.screen_ratio)
+
+    def release_shortcut(self):
+        keyboard.release("ctrl")
+        keyboard.release("*")
+
+    def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
+        self.disconnect()
+        super().closeEvent(a0)
+
