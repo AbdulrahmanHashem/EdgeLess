@@ -55,10 +55,10 @@ class Client(socket.socket):
         try:
             self.shutdown(socket.SHUT_RDWR)
         except Exception as e:
-            print(f"Disconnect Shutdown Catch : {e}")
+            print(f"Client Shutdown Catch : {e}")
 
         try:
             self.close()
             self.connected.value = False
         except Exception as e:
-            print(f"Disconnect Close Catch : {e}")
+            print(f"Client Close Catch : {e}")

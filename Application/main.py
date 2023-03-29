@@ -1,23 +1,20 @@
+import ctypes
 import sys
 
+from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QApplication
-from Application.UserInterface.ClientUI import ClientWindow
-from Application.UserInterface.ServerUI import ServerWindow
+from Application.UserInterface.MainUI import EdgeLess
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
 
-    server_window = ServerWindow()
-    server_window.show()
+    app.setWindowIcon(QIcon(".Resources/EdgeLess_big.png"))
 
-    sys.exit(app.exec())
+    myappid = 'NTS.EdgeLess.nothing.1'
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-
-    client_window = ClientWindow()
-    client_window.show()
+    edge_less = EdgeLess()
+    edge_less.show()
 
     sys.exit(app.exec())

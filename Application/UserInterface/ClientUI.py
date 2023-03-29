@@ -10,11 +10,11 @@ from Application.EventListeners.mouse_events import mouse_event_performer
 from Application.Networking.client import Client
 
 
-class ClientWindow(QtWidgets.QMainWindow):
+class ClientWindow(QtWidgets.QWidget):
     def setup_ui(self):
-        main_widget = QtWidgets.QWidget()
-        v_layout = QtWidgets.QVBoxLayout(main_widget)
-        self.setCentralWidget(main_widget)
+        # main_widget = QtWidgets.QWidget()
+        v_layout = QtWidgets.QVBoxLayout()
+        self.setLayout(v_layout)
 
         self.state = QtWidgets.QLabel("")
         v_layout.addWidget(self.state, alignment=Qt.AlignmentFlag.AlignCenter)

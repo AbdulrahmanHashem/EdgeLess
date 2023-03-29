@@ -1,3 +1,4 @@
+import socket
 import threading
 
 import keyboard
@@ -11,11 +12,13 @@ from Application.EventListeners.mouse_events import MouseHandler
 from Application.Networking.server import Server
 
 
-class ServerWindow(QtWidgets.QMainWindow):
+class ServerWindow(QtWidgets.QWidget):
     def setup_ui(self):
-        main_widget = QtWidgets.QWidget()
-        v_layout = QtWidgets.QVBoxLayout(main_widget)
-        self.setCentralWidget(main_widget)
+        v_layout = QtWidgets.QVBoxLayout()
+        self.setLayout(v_layout)
+
+        self.addresses = QtWidgets.QLabel(str(socket.gethostbyname_ex(socket.gethostname())[2]))
+        v_layout.addWidget(self.addresses, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.address_port = QtWidgets.QLabel("")
         v_layout.addWidget(self.address_port, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -37,7 +40,7 @@ class ServerWindow(QtWidgets.QMainWindow):
             self.address_port.setText(
                 self.address_port.text() +
                 "\n" +
-                "   Connected to" +
+                "   Connected to " +
                 "\n" +
                 str(self.server.client_address[0]) + " : " + str(self.server.client_address[1]))
 
