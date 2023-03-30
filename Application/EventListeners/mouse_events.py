@@ -17,10 +17,11 @@ class MouseHandler:
         self.session_on = True
         self.session_start = True
 
-        if self.session_start:
-            x, y = mouse.get_position()
-            self.context.server.send_data(f"new session,{x},{y}")
-            self.session_start = False
+        for i in range(3):
+            if self.session_start:
+                x, y = mouse.get_position()
+                self.context.server.send_data(f"new session,{x},{y}")
+                self.session_start = False
 
     def stop_mouse(self):
         if self.listener is not None:
@@ -51,10 +52,10 @@ def mouse_event_performer(data, screen_ratio, zero):
         if data.__contains__("Move"):
             event, x, y = data.split(",")
             ox, oy = zero.split(",")
-            x = ox - x
-            y = oy - y
+            x = int(ox) - int(x)
+            y = int(oy) - int(y)
             cx, xy = mouse.get_position()
-            mouse.play([mouse.MoveEvent(x=cx + x, y=xy + y, time=0)], 0)
+            mouse.play([mouse.MoveEvent(x=cx - x, y=xy - y, time=0)], 0)
 
         elif data.__contains__("Button"):
             event, button, down = data.split(",")

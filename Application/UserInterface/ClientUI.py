@@ -87,7 +87,7 @@ class ClientWindow(QWidget):
             print(f"Start Catch : {e}")
 
     def receive_control_events(self):
-        zero = ""
+        zero = "50,50"
         while not self.controller.is_set():
             data = self.client.receive()
 
@@ -100,6 +100,7 @@ class ClientWindow(QWidget):
             elif data.__contains__("new"):
                 self.release_shortcut()
                 zero = data[12:]
+                print(zero)
 
             if data:
                 events = data.split(";")
