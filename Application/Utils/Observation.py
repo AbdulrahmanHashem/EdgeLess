@@ -5,8 +5,7 @@ class Observable(object):
     def __init__(self):
         super().__init__()
         self._observers = []
-        self._value = None
-        # self.context = context
+        self._value = False
 
     @property
     def value(self):
@@ -26,11 +25,3 @@ class Observable(object):
 
     def remove_all_observers(self):
         self._observers.clear()
-
-
-# # Test
-# do = Observable()
-# do.value = False
-# do.add_observer(lambda e: print("5") if not e else print(2))
-#
-# do.value = True

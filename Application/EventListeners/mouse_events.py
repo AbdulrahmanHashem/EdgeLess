@@ -7,13 +7,16 @@ class MouseHandler:
         self.context = context
         self.is_hooked = False
         self.listener: Listener | None = None
-        self.listener = Listener(on_click=self.on_click, on_scroll=self.on_scroll, on_move=self.on_move, suppress=True)
+        self.session_on = False
 
     def start_mouse(self):
+        self.listener = Listener(on_click=self.on_click, on_scroll=self.on_scroll, on_move=self.on_move, suppress=True)
         self.listener.run()
+        self.session_on = True
 
     def stop_mouse(self):
         self.listener.stop()
+        self.session_on = False
 
     def on_click(self, x, y, button, down):
         down = 'down' if down else 'up'

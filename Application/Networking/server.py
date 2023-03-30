@@ -15,7 +15,6 @@ class Server(socket.socket):
 
         # connection state
         self.connected = Observable()
-        self.connected.value = False
         self.connected.add_observer(self.context.on_connected)
 
         self.client_socket = None
@@ -36,19 +35,15 @@ class Server(socket.socket):
     def connect_now(self):
         """ Wait for client to connect """
         try:
-            try:
-                self.connected.value = None
-                self.client_socket, self.client_address = self.accept()
-                self.connected.value = True
-
-            except Exception as e:
-                print(f"Server 'Connect Now' Catch : {e}"
-                      f"\n      You Likely Stopped the Server Before a Successful Connection")
-                return None
+            self.connected.value = None
+            self.client_socket, self.client_address = self.accept()
+            self.connected.value = True
 
         except Exception as e:
-            self.connected.value = False
-            print(f"Server 'Connect Now' Unknown Catch : {e}")
+            print(f"Server 'Connect Now' Catch : {e}"
+                  f"\n      You Likely Stopped the Server Before a Successful Connection")
+            self.context.disconnect()
+            return None
 
     def send_data(self, data: str):
         """ Mouse event handler """
@@ -56,10 +51,12 @@ class Server(socket.socket):
             if self.connected.value:
                 self.client_socket.sendall(data.encode())
                 self.last_sent = data
-        except socket.error as e:
+                return True
+        except Exception as e:
             print(f"Send Data Catch : {e}")
             self.client_disconnection = True
             self.context.disconnect()
+            return False
 
     def stop(self):
         try:
