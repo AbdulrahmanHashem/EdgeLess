@@ -1,25 +1,26 @@
 import threading
 
 import keyboard
-from PyQt6 import QtWidgets, QtGui
+from PyQt6 import QtGui
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QGuiApplication
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton
 
 from Application.EventListeners.keyboard_events import key_press_performer
 from Application.EventListeners.mouse_events import mouse_event_performer
 from Application.Networking.client import Client
 
 
-class ClientWindow(QtWidgets.QMainWindow):
+class ClientWindow(QWidget):
     def setup_ui(self):
-        main_widget = QtWidgets.QWidget()
-        v_layout = QtWidgets.QVBoxLayout(main_widget)
-        self.setCentralWidget(main_widget)
+        # main_widget = QtWidgets.QWidget()
+        v_layout = QVBoxLayout()
+        self.setLayout(v_layout)
 
-        self.state = QtWidgets.QLabel("")
+        self.state = QLabel("")
         v_layout.addWidget(self.state, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.switch = QtWidgets.QPushButton("Connect")
+        self.switch = QPushButton("Connect")
         v_layout.addWidget(self.switch, alignment=Qt.AlignmentFlag.AlignCenter)
 
     def on_connected(self, new):

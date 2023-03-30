@@ -1,26 +1,30 @@
+import socket
 import threading
 
 import keyboard
 import pyautogui
 
-from PyQt6 import QtWidgets, QtGui
+from PyQt6 import QtGui
 from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton
 
 from Application.EventListeners.keyboard_events import KeyboardHandler
 from Application.EventListeners.mouse_events import MouseHandler
 from Application.Networking.server import Server
 
 
-class ServerWindow(QtWidgets.QMainWindow):
+class ServerWindow(QWidget):
     def setup_ui(self):
-        main_widget = QtWidgets.QWidget()
-        v_layout = QtWidgets.QVBoxLayout(main_widget)
-        self.setCentralWidget(main_widget)
+        v_layout = QVBoxLayout()
+        self.setLayout(v_layout)
 
-        self.address_port = QtWidgets.QLabel("")
+        self.addresses = QLabel(str(socket.gethostbyname_ex(socket.gethostname())[2]))
+        v_layout.addWidget(self.addresses, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        self.address_port = QLabel("")
         v_layout.addWidget(self.address_port, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.start = QtWidgets.QPushButton("Start Server")
+        self.start = QPushButton("Start Server")
         v_layout.addWidget(self.start, alignment=Qt.AlignmentFlag.AlignCenter)
 
     def on_connected(self, new):
@@ -37,7 +41,7 @@ class ServerWindow(QtWidgets.QMainWindow):
             self.address_port.setText(
                 self.address_port.text() +
                 "\n" +
-                "   Connected to" +
+                "   Connected to " +
                 "\n" +
                 str(self.server.client_address[0]) + " : " + str(self.server.client_address[1]))
 
@@ -66,10 +70,10 @@ class ServerWindow(QtWidgets.QMainWindow):
 
     def toggle_server(self) -> None:
         if self.server.connected.value is False:
+            if self.connect_thread is not None:
+                self.connect_thread.join()
 
             if self.server.client_disconnection:
-                self.mouse_thread.join()
-                self.connect_thread.join()
                 self.server.client_disconnection = False
 
             self.connect()
@@ -106,11 +110,14 @@ class ServerWindow(QtWidgets.QMainWindow):
         self.keyboard_handler.stop_keyboard()
         self.mouse_handler.stop_mouse()
         self.session.set()
+        keyboard.add_hotkey("ctrl+*", self.start_session)
 
     def start_session(self) -> None:
         if not self.server.connected.value:
             print("Session Start Error : Not Connected")
             return
+        if self.mouse_thread is not None:
+            self.mouse_thread.join()
 
         try:
             self.session.clear()
