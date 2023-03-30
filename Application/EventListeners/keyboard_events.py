@@ -1,7 +1,16 @@
 import keyboard
 
 from keyboard._winkeyboard import official_virtual_keys
+from keyboard._canonical_names import canonical_names
 
+full = []
+
+for key in official_virtual_keys:
+    full.append(key)
+
+for key in canonical_names:
+    if full.__contains__(canonical_names[key]) is False:
+        full.append(canonical_names[key])
 
 class KeyboardHandler:
     def __init__(self, context):
@@ -11,8 +20,11 @@ class KeyboardHandler:
         self.session_on = False
 
     def start_keyboard(self):
-        for key in official_virtual_keys:
-            keyboard.hook_key(official_virtual_keys[key][0], self.key_handler, suppress=True)
+        for key in full:
+            try:
+                keyboard.hook_key(key, self.key_handler, suppress=True)
+            except Exception as e:
+                print(e)
             keyboard.release("*")
             keyboard.release("ctrl")
         self.session_on = True
@@ -23,7 +35,8 @@ class KeyboardHandler:
 
     def key_handler(self, event: keyboard.KeyboardEvent):
         self.context.server. \
-            send_data(f"keyboard,{event.event_type},{event.scan_code},{event.name},{event.time},{event.device},{event.modifiers},{event.is_keypad};")
+            send_data(
+            f"keyboard,,{event.event_type},,{event.scan_code},,{event.name},,{event.time},,{event.device},,{event.modifiers},,{event.is_keypad};;")
 
         if event.name == "*" and self.last_pressed == "ctrl":
             self.context.stop_listening_to_controls()
@@ -34,7 +47,7 @@ class KeyboardHandler:
 def key_press_performer(data, context):
     """ Keyboard Key Events executor """
     try:
-        event, event_type, scan_code, name, time, device, modifiers, is_keypad = data.split(",")
+        event, event_type, scan_code, name, time, device, modifiers, is_keypad = data.split(",,")
         if not context.last_time == float(time):
             context.last_time = float(time)
             keyboard.send(name, True, False) if event_type == keyboard.KEY_DOWN else keyboard.send(name, False, True)

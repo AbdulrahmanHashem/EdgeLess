@@ -3,7 +3,6 @@ import threading
 import keyboard
 from PyQt6 import QtGui
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QGuiApplication
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton
 
 from Application.EventListeners.keyboard_events import key_press_performer
@@ -98,7 +97,7 @@ class ClientWindow(QWidget):
                 zero = data[12:]
 
             if data:
-                events = data.split(";")
+                events = data.split(";;")
                 for event in events:
                     if not event == "":
                         if event.__contains__("keyboard"):

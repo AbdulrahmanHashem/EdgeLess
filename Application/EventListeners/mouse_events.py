@@ -27,15 +27,15 @@ class MouseHandler:
     def on_click(self, x, y, button, down):
         down = 'down' if down else 'up'
         button = str(button)[7:]
-        self.context.server.send_data(f"ButtonEvent,{button},{down};")
+        self.context.server.send_data(f"ButtonEvent,,{button},,{down};;")
         return True
 
     def on_scroll(self, x, y, is_h, delta):
-        self.context.server.send_data(f"WheelEvent,{is_h},{delta};")
+        self.context.server.send_data(f"WheelEvent,,{is_h},,{delta};;")
         return True
 
     def on_move(self, x, y):
-        self.context.server.send_data(f"MoveEvent,{x},{y};")
+        self.context.server.send_data(f"MoveEvent,,{x},,{y};;")
         self.last_sent_loc = f"{x},{y}"
         return True
 
@@ -44,15 +44,15 @@ def mouse_event_performer(data, zero):
     """ Mouse event executor """
     try:
         if data.__contains__("Move"):
-            event, x, y = data.split(",")
-            ox, oy = zero.split(",")
+            event, x, y = data.split(",,")
+            ox, oy = zero.split(",,")
             x = int(ox) - int(x)
             y = int(oy) - int(y)
             cx, xy = mouse.get_position()
             mouse.play([mouse.MoveEvent(x=cx - x, y=xy - y, time=0)], 0)
 
         elif data.__contains__("Button"):
-            event, button, down = data.split(",")
+            event, button, down = data.split(",,")
             try:
                 mouse.play([mouse.ButtonEvent(
                     event_type=down.strip(),
@@ -62,7 +62,7 @@ def mouse_event_performer(data, zero):
                 print(e)
 
         else:
-            event, is_h, delta = data.split(",")
+            event, is_h, delta = data.split(",,")
             try:
                 mouse.play([mouse.WheelEvent(
                     delta=float(delta.strip()),

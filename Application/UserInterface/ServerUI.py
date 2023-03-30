@@ -2,7 +2,6 @@ import socket
 import threading
 
 import keyboard
-import pyautogui
 
 from PyQt6 import QtGui
 from PyQt6.QtCore import Qt
