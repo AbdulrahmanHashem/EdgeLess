@@ -9,8 +9,7 @@ from Application.UserInterface.MainUI import EdgeLess
 if __name__ == '__main__':
     app = QApplication(sys.argv)
 
-    # app.setStyle('Fusion')
-    app.setWindowIcon(QIcon(".Resources/EdgeLess_Logo.ico"))
+    app.setWindowIcon(QIcon("Application/.Resources/EdgeLess_Logo.ico"))
 
     myappid = 'NTS.EdgeLess.EdgeLess.1.0'
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
