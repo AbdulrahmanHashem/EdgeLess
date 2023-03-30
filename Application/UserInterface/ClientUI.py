@@ -29,9 +29,6 @@ class ClientWindow(QWidget):
             self.state.setText(f"Attempting to connect to {self.client.CLIENT_HOST}, {self.client.CLIENT_PORT}")
 
         elif new:
-            s_size = self.client.receive()
-            self.screen_ratio = QGuiApplication.primaryScreen().availableGeometry().width() / int(s_size.split(",")[0])
-
             self.switch.setText("Disconnect")
             self.state.setText(f"{self.client.CLIENT_HOST} : {self.client.CLIENT_PORT}")
 
@@ -50,7 +47,6 @@ class ClientWindow(QWidget):
 
         self.client = Client(self)
 
-        self.screen_ratio = 1
         self.last_time = 0.0
         self.last_pressed = ""
 
@@ -87,7 +83,7 @@ class ClientWindow(QWidget):
             print(f"Start Catch : {e}")
 
     def receive_control_events(self):
-        zero = "50,50"
+        zero = ""
         while not self.controller.is_set():
             data = self.client.receive()
 
@@ -100,7 +96,6 @@ class ClientWindow(QWidget):
             elif data.__contains__("new"):
                 self.release_shortcut()
                 zero = data[12:]
-                print(zero)
 
             if data:
                 events = data.split(";")
@@ -109,7 +104,7 @@ class ClientWindow(QWidget):
                         if event.__contains__("keyboard"):
                             key_press_performer(event, self)
                         else:
-                            mouse_event_performer(event, self.screen_ratio, zero)
+                            mouse_event_performer(event, zero)
 
     def release_shortcut(self):
         keyboard.release("ctrl")

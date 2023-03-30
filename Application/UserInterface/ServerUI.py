@@ -35,9 +35,6 @@ class ServerWindow(QWidget):
 
         elif new:
             """ On Connected True"""
-            SCREEN_WIDTH, SCREEN_HEIGHT = pyautogui.size()
-            self.server.send_data(f"{SCREEN_WIDTH},{SCREEN_HEIGHT}")
-
             self.address_port.setText(
                 self.address_port.text() +
                 "\n" +
