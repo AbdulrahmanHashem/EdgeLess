@@ -20,6 +20,7 @@ class KeyboardHandler:
         self.session_on = False
 
     def start_keyboard(self):
+        keyboard.hook_key("\|".strip("|"), self.key_handler, suppress=True)
         for key in full:
             try:
                 keyboard.hook_key(key, self.key_handler, suppress=True)
