@@ -15,8 +15,9 @@ class MouseHandler:
         self.session_on = True
 
     def stop_mouse(self):
-        self.listener.stop()
-        self.session_on = False
+        if self.listener is not None:
+            self.listener.stop()
+            self.session_on = False
 
     def on_click(self, x, y, button, down):
         down = 'down' if down else 'up'
