@@ -97,7 +97,7 @@ class ClientWindow(QWidget):
                 zero = data[12:]
 
             if data:
-                events = data.split(";;")
+                events = data.split(";|")
                 for event in events:
                     if not event == "":
                         if event.__contains__("keyboard"):
