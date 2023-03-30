@@ -33,15 +33,6 @@ class Client(socket.socket):
     def receive(self) -> str:
         try:
             data: str = self.recv(self.BUFFER_SIZE).decode()
-            if data == "" or data.__contains__("clo"):
-                self.client_disconnection = True
-                self.context.disconnect()
-                self.context.release_shortcut()
-
-                return ""
-            elif data.__contains__("new"):
-                self.context.release_shortcut()
-
             return data
         except socket.error as e:
             print(f"Receive Catch : {e}")

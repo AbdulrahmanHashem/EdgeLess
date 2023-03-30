@@ -87,8 +87,20 @@ class ClientWindow(QWidget):
             print(f"Start Catch : {e}")
 
     def receive_control_events(self):
+        zero = ""
         while not self.controller.is_set():
             data = self.client.receive()
+
+            if data == "" or data.__contains__("clo"):
+                self.client.client_disconnection = True
+                self.disconnect()
+                self.release_shortcut()
+                return
+
+            elif data.__contains__("new"):
+                self.release_shortcut()
+                zero = data[12:]
+
             if data:
                 events = data.split(";")
                 for event in events:
@@ -96,7 +108,7 @@ class ClientWindow(QWidget):
                         if event.__contains__("keyboard"):
                             key_press_performer(event, self)
                         else:
-                            mouse_event_performer(event, self.screen_ratio)
+                            mouse_event_performer(event, self.screen_ratio, zero)
 
     def release_shortcut(self):
         keyboard.release("ctrl")

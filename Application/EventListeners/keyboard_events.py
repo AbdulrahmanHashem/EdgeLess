@@ -8,7 +8,6 @@ class KeyboardHandler:
         self.context = context
         self.blocked_keys = {}
         self.last_pressed = ""
-        self.session_start = True
         self.session_on = False
 
     def start_keyboard(self):
@@ -18,16 +17,11 @@ class KeyboardHandler:
             keyboard.release("ctrl")
         self.session_on = True
 
-
     def stop_keyboard(self):
         keyboard.unhook_all()
         self.session_on = False
 
     def key_handler(self, event: keyboard.KeyboardEvent):
-        if self.session_start:
-            self.context.server.send_data("new session")
-            self.session_start = False
-
         self.context.server. \
             send_data(f"keyboard,{event.event_type},{event.scan_code},{event.name},{event.time},{event.device},{event.modifiers},{event.is_keypad};")
 

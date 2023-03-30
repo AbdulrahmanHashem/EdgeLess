@@ -8,11 +8,19 @@ class MouseHandler:
         self.is_hooked = False
         self.listener: Listener | None = None
         self.session_on = False
+        self.session_start = True
+        self.last_sent_loc = ""
 
     def start_mouse(self):
         self.listener = Listener(on_click=self.on_click, on_scroll=self.on_scroll, on_move=self.on_move, suppress=True)
         self.listener.run()
         self.session_on = True
+        self.session_start = True
+
+        if self.session_start:
+            x, y = mouse.get_position()
+            self.context.server.send_data(f"new session,{x},{y}")
+            self.session_start = False
 
     def stop_mouse(self):
         if self.listener is not None:
@@ -30,20 +38,23 @@ class MouseHandler:
         return True
 
     def on_move(self, x, y):
-        mouse.move(x, y)
+        # print(x, y)
+        # mouse.move(x, y)
         self.context.server.send_data(f"MoveEvent,{x},{y};")
+        self.last_sent_loc = f"{x},{y}"
         return True
 
 
-def mouse_event_performer(data, screen_ratio):
+def mouse_event_performer(data, screen_ratio, zero):
     """ Mouse event executor """
     try:
         if data.__contains__("Move"):
             event, x, y = data.split(",")
-            mouse.play([mouse.MoveEvent(
-                x=int(x) * screen_ratio,
-                y=int(y) * screen_ratio,
-                time=0)], 0)
+            ox, oy = zero.split(",")
+            x = ox - x
+            y = oy - y
+            cx, xy = mouse.get_position()
+            mouse.play([mouse.MoveEvent(x=cx + x, y=xy + y, time=0)], 0)
 
         elif data.__contains__("Button"):
             event, button, down = data.split(",")

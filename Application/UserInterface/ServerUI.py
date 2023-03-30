@@ -95,10 +95,10 @@ class ServerWindow(QWidget):
 
     def disconnect(self):
         self.start.setEnabled(False)
-        self.server.stop()
         self.stop_listening_to_controls()
         if self.server.client_disconnection is False:
             self.server.send_data("close")
+        self.server.stop()
         self.start.setEnabled(True)
 
 
