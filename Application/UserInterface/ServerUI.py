@@ -24,9 +24,12 @@ class ServerWindow(QWidget):
         v_layout.addLayout(H_layout)
 
         def enable():
-            if self.address.isEnabled() or self.port.isEnabled():
+            if self.address.isEnabled() and self.port.isEnabled():
                 self.address.setEnabled(False)
                 self.port.setEnabled(False)
+            elif self.address.isEnabled() is False or self.port.isEnabled() is False:
+                self.address.setEnabled(True)
+                self.port.setEnabled(True)
             else:
                 self.address.setEnabled(True)
                 self.port.setEnabled(True)
