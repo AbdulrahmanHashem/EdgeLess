@@ -1,6 +1,9 @@
+import re
 import socket
 
 from Application.Utils.Observation import Observable
+
+rex = re.compile(r'^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$')
 
 
 class Server(socket.socket):
@@ -13,9 +16,6 @@ class Server(socket.socket):
         self.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # Enable reuse of the same address
         self.context = context
 
-        self.HOST = self.context.address.text()
-        self.PORT = self.context.port.value()
-
         # connection state
         self.connected = Observable()
         self.connected.add_observer(self.context.on_connected)
@@ -27,10 +27,16 @@ class Server(socket.socket):
 
     def run(self):
         try:
-            self.__init__(self.context)
-            self.bind((self.HOST, self.PORT))  # bind the socket to a local address and port
-            self.listen(1)  # Listen for one connection at a time only
-            return True
+            self.HOST = self.context.address.text()
+            self.PORT = self.context.port.value()
+            if rex.match(self.HOST):
+                self.__init__(self.context)
+                self.bind((self.HOST, self.PORT))  # bind the socket to a local address and port
+                self.listen(1)  # Listen for one connection at a time only
+                return True
+            else:
+                self.context.status.setText("Incorrect Address Format.")
+                return False
         except Exception as e:
             print(f"Server Run Catch : {e}")
             return False

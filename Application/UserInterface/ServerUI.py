@@ -54,8 +54,8 @@ class ServerWindow(QWidget):
         self.port.editingFinished.connect(lambda: self.port.setEnabled(False))
         H_layout.addWidget(self.port)
 
-        self.conncted = QLabel()
-        v_layout.addWidget(self.conncted, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.status = QLabel()
+        v_layout.addWidget(self.status, alignment=Qt.AlignmentFlag.AlignCenter)
 
         #
         self.start = QPushButton("Start Server")
@@ -64,18 +64,18 @@ class ServerWindow(QWidget):
     def on_connected(self, new):
         if new is None:
             """ On Connected None"""
-            self.conncted.setText("Waiting For Connection")
+            self.status.setText("Waiting For Connection")
             self.start.setText("Stop Server")
 
         elif new:
             """ On Connected True"""
-            self.conncted.setText(f"Connected to {self.server.client_address[0]} : {self.server.client_address[1]}")
+            self.status.setText(f"Connected to {self.server.client_address[0]} : {self.server.client_address[1]}")
 
             keyboard.add_hotkey("ctrl+*", self.start_session)
 
         else:
             """ On Connected False"""
-            self.conncted.setText("")
+            self.status.setText("")
             self.start.setText("Start Server")
 
     def __init__(self):

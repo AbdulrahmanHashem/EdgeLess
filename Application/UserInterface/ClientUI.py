@@ -41,11 +41,11 @@ class ClientWindow(QWidget):
     def on_connected(self, new):
         if new is None:
             self.switch.setText("Connecting")
-            self.state.setText(f"Attempting to connect to {self.client.CLIENT_HOST}, {self.client.CLIENT_PORT}")
+            self.state.setText(f"Attempting to connect to {self.client.HOST}, {self.client.PORT}")
 
         elif new:
             self.switch.setText("Disconnect")
-            self.state.setText(f"{self.client.CLIENT_HOST} : {self.client.CLIENT_PORT}")
+            self.state.setText(f"{self.client.HOST} : {self.client.PORT}")
 
             self.start_session()
 
