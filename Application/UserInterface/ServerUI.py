@@ -5,7 +5,7 @@ import keyboard
 
 from PyQt6 import QtGui
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QTextEdit, QSpinBox, QLineEdit
 
 from Application.EventListeners.keyboard_events import KeyboardHandler
 from Application.EventListeners.mouse_events import MouseHandler
@@ -16,13 +16,42 @@ class ServerWindow(QWidget):
     def setup_ui(self):
         v_layout = QVBoxLayout()
         self.setLayout(v_layout)
-
+        #
         self.addresses = QLabel(str(socket.gethostbyname_ex(socket.gethostname())[2]))
         v_layout.addWidget(self.addresses, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.address_port = QLabel("")
-        v_layout.addWidget(self.address_port, alignment=Qt.AlignmentFlag.AlignCenter)
+        H_layout = QHBoxLayout()
+        v_layout.addLayout(H_layout)
 
+        def enable():
+            if self.address.isEnabled() or self.port.isEnabled():
+                self.address.setEnabled(False)
+                self.port.setEnabled(False)
+            else:
+                self.address.setEnabled(True)
+                self.port.setEnabled(True)
+
+        #
+        self.edit = QPushButton("Edit")
+        H_layout.addWidget(self.edit)
+        self.edit.setMaximumWidth(50)
+        self.edit.clicked.connect(enable)
+
+        self.address = QLineEdit(str(socket.gethostbyname_ex(socket.gethostname())[2][-1]))
+        self.address.setMaximumSize(150, 26)
+        self.address.setEnabled(False)
+        H_layout.addWidget(self.address)
+        self.address.editingFinished.connect(lambda: self.address.setEnabled(False))
+
+        self.port = QSpinBox()
+        self.port.setMinimum(0)
+        self.port.setMaximum(65535)
+        self.port.setValue(9999)
+        self.port.setEnabled(False)
+        self.port.editingFinished.connect(lambda: self.port.setEnabled(False))
+        H_layout.addWidget(self.port)
+
+        #
         self.start = QPushButton("Start Server")
         v_layout.addWidget(self.start, alignment=Qt.AlignmentFlag.AlignCenter)
 

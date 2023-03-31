@@ -4,7 +4,7 @@ import threading
 import keyboard
 from PyQt6 import QtGui
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QTextEdit
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QTextEdit, QHBoxLayout, QSpinBox
 
 from Application.EventListeners.keyboard_events import key_press_performer
 from Application.EventListeners.mouse_events import mouse_event_performer
@@ -19,13 +19,21 @@ class ClientWindow(QWidget):
         self.state = QLabel("")
         v_layout.addWidget(self.state, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.id = QTextEdit()
-        v_layout.addWidget(self.id)
-        self.id.setMaximumHeight(26)
+        H_layout = QHBoxLayout()
+        v_layout.addLayout(H_layout)
+
         text = ""
         for i in socket.gethostbyname_ex(socket.gethostname())[2][-1].split(".")[0:3]:
             text = text + f"{i}."
-        self.id.setText(text)
+        self.id = QTextEdit(text)
+        self.id.setMaximumSize(210, 26)
+        H_layout.addWidget(self.id)
+
+        self.port = QSpinBox()
+        self.port.setMinimum(0)
+        self.port.setMaximum(65535)
+        self.port.setValue(9999)
+        H_layout.addWidget(self.port)
 
         self.switch = QPushButton("Connect")
         v_layout.addWidget(self.switch, alignment=Qt.AlignmentFlag.AlignCenter)

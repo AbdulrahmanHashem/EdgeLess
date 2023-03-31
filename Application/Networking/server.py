@@ -13,6 +13,9 @@ class Server(socket.socket):
         self.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # Enable reuse of the same address
         self.context = context
 
+        self.HOST = self.context.address.text()
+        self.PORT = self.context.port.value()
+
         # connection state
         self.connected = Observable()
         self.connected.add_observer(self.context.on_connected)
