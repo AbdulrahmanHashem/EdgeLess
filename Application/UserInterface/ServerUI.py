@@ -40,8 +40,8 @@ class ServerWindow(QWidget):
         self.address = QLineEdit(str(socket.gethostbyname_ex(socket.gethostname())[2][-1]))
         self.address.setMaximumSize(150, 26)
         self.address.setEnabled(False)
-        H_layout.addWidget(self.address)
         self.address.editingFinished.connect(lambda: self.address.setEnabled(False))
+        H_layout.addWidget(self.address)
 
         self.port = QSpinBox()
         self.port.setMinimum(0)
@@ -51,6 +51,9 @@ class ServerWindow(QWidget):
         self.port.editingFinished.connect(lambda: self.port.setEnabled(False))
         H_layout.addWidget(self.port)
 
+        self.conncted = QLabel()
+        v_layout.addWidget(self.conncted, alignment=Qt.AlignmentFlag.AlignCenter)
+
         #
         self.start = QPushButton("Start Server")
         v_layout.addWidget(self.start, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -58,23 +61,18 @@ class ServerWindow(QWidget):
     def on_connected(self, new):
         if new is None:
             """ On Connected None"""
-            self.address_port.setText(str(self.server.getsockname()))
+            self.conncted.setText("Waiting For Connection")
             self.start.setText("Stop Server")
 
         elif new:
             """ On Connected True"""
-            self.address_port.setText(
-                self.address_port.text() +
-                "\n" +
-                "   Connected to " +
-                "\n" +
-                str(self.server.client_address[0]) + " : " + str(self.server.client_address[1]))
+            self.conncted.setText(f"Connected to {self.server.client_address[0]} : {self.server.client_address[1]}")
 
             keyboard.add_hotkey("ctrl+*", self.start_session)
 
         else:
             """ On Connected False"""
-            self.address_port.setText("")
+            self.conncted.setText("")
             self.start.setText("Start Server")
 
     def __init__(self):
