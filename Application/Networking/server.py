@@ -4,7 +4,7 @@ from Application.Utils.Observation import Observable
 
 
 class Server(socket.socket):
-    HOST = "192.168.1.100"  # Use all available interfaces
+    HOST = str(socket.gethostbyname_ex(socket.gethostname())[2][-1])  # Use all available interfaces
     PORT = 9999  # Arbitrary non-privileged port
     BUFFER_SIZE = 1024 * 2
 

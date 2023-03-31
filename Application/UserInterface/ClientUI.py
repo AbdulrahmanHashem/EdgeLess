@@ -1,9 +1,10 @@
+import socket
 import threading
 
 import keyboard
 from PyQt6 import QtGui
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QTextEdit
 
 from Application.EventListeners.keyboard_events import key_press_performer
 from Application.EventListeners.mouse_events import mouse_event_performer
@@ -12,12 +13,19 @@ from Application.Networking.client import Client
 
 class ClientWindow(QWidget):
     def setup_ui(self):
-        # main_widget = QtWidgets.QWidget()
         v_layout = QVBoxLayout()
         self.setLayout(v_layout)
 
         self.state = QLabel("")
         v_layout.addWidget(self.state, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        self.id = QTextEdit()
+        v_layout.addWidget(self.id)
+        self.id.setMaximumHeight(26)
+        text = ""
+        for i in socket.gethostbyname_ex(socket.gethostname())[2][-1].split(".")[0:3]:
+            text = text + f"{i}."
+        self.id.setText(text)
 
         self.switch = QPushButton("Connect")
         v_layout.addWidget(self.switch, alignment=Qt.AlignmentFlag.AlignCenter)
