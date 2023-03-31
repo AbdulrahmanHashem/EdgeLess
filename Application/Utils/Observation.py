@@ -1,6 +1,3 @@
-import time
-
-
 class Observable(object):
     def __init__(self):
         super().__init__()
