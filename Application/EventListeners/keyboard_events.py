@@ -1,13 +1,5 @@
 import keyboard
 
-from keyboard._winkeyboard import official_virtual_keys
-
-full = []
-
-for key in official_virtual_keys:
-    full.append(key)
-    full.append(official_virtual_keys[key][0])
-
 
 class KeyboardHandler:
     def __init__(self, context):
@@ -17,15 +9,7 @@ class KeyboardHandler:
         self.session_on = False
 
     def start_keyboard(self):
-        keyboard.hook_key("\|".strip("|"), self.key_handler, suppress=True)
-        keyboard.hook_key("[", self.key_handler, suppress=True)
-        for key in full:
-            try:
-                keyboard.hook_key(key, self.key_handler, suppress=True)
-            except Exception as e:
-                print(e)
-            keyboard.release("*")
-            keyboard.release("ctrl")
+        keyboard.hook(self.key_handler, suppress=True)
         self.session_on = True
 
     def stop_keyboard(self):
@@ -35,13 +19,19 @@ class KeyboardHandler:
     def key_handler(self, event: keyboard.KeyboardEvent):
         self.context.server. \
             send_data(
-            f"keyboard,|{event.event_type},|{event.scan_code},|{event.name},|{event.time},|{event.device},|{event.modifiers},|{event.is_keypad};|")
+            f"keyboard,|{event.event_type}"
+            f",|{event.scan_code}"
+            f",|{event.name}"
+            f",|{event.time}"
+            f",|{event.device}"
+            f",|{event.modifiers}"
+            f",|{event.is_keypad};|")
 
         if event.name == "*" and self.last_pressed == "ctrl":
             self.context.stop_listening_to_controls()
+            self.last_pressed = event.name
 
         self.last_pressed = event.name
-
 
 def key_press_performer(data, context):
     """ Keyboard Key Events executor """

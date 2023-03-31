@@ -127,7 +127,6 @@ class ServerWindow(QWidget):
         self.server.stop()
         self.start.setEnabled(True)
 
-
     def start_listening_to_controls(self):
         self.keyboard_handler.start_keyboard()
         self.mouse_handler.start_mouse()
@@ -139,15 +138,20 @@ class ServerWindow(QWidget):
         if keyboard._hotkeys.__contains__("ctrl+*"):
             keyboard.remove_hotkey("ctrl+*")
 
-        self.session.set()
-        self.mouse_handler.stop_mouse()
         self.keyboard_handler.stop_keyboard()
+        self.mouse_handler.stop_mouse()
+        self.session.set()
 
         keyboard.add_hotkey("ctrl+*", self.start_session)
 
     def start_session(self) -> None:
+        if self.server.client_disconnection and self.server.connected.value:
+            self.disconnect()
+            return
+
         if self.keyboard_handler.session_on and self.mouse_handler.session_on:
             self.stop_listening_to_controls()
+            # self.server.client_disconnection = False
 
         if (self.keyboard_handler.session_on and self.mouse_handler.session_on) is False:
             if not self.server.connected.value:

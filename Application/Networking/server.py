@@ -58,7 +58,8 @@ class Server(socket.socket):
         except Exception as e:
             print(f"Send Data Catch : {e}")
             self.client_disconnection = True
-            self.context.disconnect()
+            # self.context.disconnect()
+            self.context.stop_listening_to_controls()
             return False
 
     def stop(self):

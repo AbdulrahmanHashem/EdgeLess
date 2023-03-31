@@ -110,7 +110,7 @@ class ClientWindow(QWidget):
 
             elif data.__contains__("new"):
                 self.release_shortcut()
-                zero = data[12:]
+                zero = data[13:]
 
             if data:
                 events = data.split(";|")
