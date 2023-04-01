@@ -1,4 +1,5 @@
 import mouse
+import pynput.mouse
 from pynput.mouse import Listener
 
 
@@ -43,35 +44,35 @@ class MouseHandler:
         return True
 
 
-def mouse_event_performer(data, zero):
+def mouse_event_performer(data, zero, mouse_controller: pynput.mouse.Controller):
     """ Mouse event executor """
-    try:
-        if data.__contains__("Move"):
+    if data.__contains__("Move"):
+        try:
             event, x, y = data.split(",|")
             ox, oy = zero.split(",|")
             x = int(ox) - int(x)
             y = int(oy) - int(y)
             cx, xy = mouse.get_position()
             mouse.play([mouse.MoveEvent(x=cx - x, y=xy - y, time=0)], 0)
+        except Exception as e:
+            print(f"Move Event Catch : {e}")
 
-        elif data.__contains__("Button"):
+    elif data.__contains__("Button"):
+        try:
+            print(data.split(",|"))
             event, button, down = data.split(",|")
-            try:
-                mouse.play([mouse.ButtonEvent(
-                    event_type=down.strip(),
-                    button=button.strip(),
-                    time=0)], 0)
-            except Exception as e:
-                print(e)
+            mouse.play([mouse.ButtonEvent(
+                event_type=down.strip(),
+                button=button.strip(),
+                time=0)], 0)
+        except Exception as e:
+            print(f"Button Event Catch : {e}")
 
-        else:
+    else:
+        try:
             event, is_h, delta = data.split(",|")
-            try:
-                mouse.play([mouse.WheelEvent(
-                    delta=float(delta.strip()),
-                    time=0)])
-            except Exception as e:
-                print(e)
-
-    except Exception as e:
-        print(e)
+            mouse.play([mouse.WheelEvent(
+                delta=float(delta.strip()),
+                time=0)])
+        except Exception as e:
+            print(f"Wheel Event Catch : {e}")
