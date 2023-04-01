@@ -1,5 +1,4 @@
 import mouse
-import pynput.mouse
 from pynput.mouse import Listener
 
 
@@ -44,7 +43,7 @@ class MouseHandler:
         return True
 
 
-def mouse_event_performer(data, zero, mouse_controller: pynput.mouse.Controller):
+def mouse_event_performer(data, zero):
     """ Mouse event executor """
     if data.__contains__("Move"):
         try:

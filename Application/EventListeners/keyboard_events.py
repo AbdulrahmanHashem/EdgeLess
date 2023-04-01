@@ -17,24 +17,11 @@ class KeyboardHandler:
         self.session_on = False
 
     def key_handler(self, event: keyboard.KeyboardEvent):
-        print(f"keyboard"
-              f",|{event.event_type}"
-              f",|{event.scan_code}"
-              f",|{event.name}"
-              f",|{event.time}"
-              f",|{event.device}"
-              f",|{event.modifiers}"
-              f",|{event.is_keypad};|")
-
-        event_name = event.name
-        if event.name == "shift":
-            event_name = "left shift"
-
         self.context.server. \
             send_data(f"keyboard"
                       f",|{event.event_type}"
                       f",|{event.scan_code}"
-                      f",|{event_name.lower() if event_name != 'decimal' else '.'}"
+                      f",|{event.name.lower() if event.name != 'decimal' else '.'}"
                       f",|{event.time}"
                       f",|{event.device}"
                       f",|{event.modifiers}"

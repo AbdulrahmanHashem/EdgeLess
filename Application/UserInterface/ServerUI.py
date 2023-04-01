@@ -5,7 +5,7 @@ import keyboard
 
 from PyQt6 import QtGui
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QTextEdit, QSpinBox, QLineEdit
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QSpinBox, QLineEdit
 
 from Application.EventListeners.keyboard_events import KeyboardHandler
 from Application.EventListeners.mouse_events import MouseHandler
