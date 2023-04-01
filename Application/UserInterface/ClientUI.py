@@ -2,7 +2,6 @@ import socket
 import threading
 
 import keyboard
-import pynput
 from PyQt6 import QtGui
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QTextEdit, QHBoxLayout, QSpinBox
@@ -38,8 +37,6 @@ class ClientWindow(QWidget):
 
         self.switch = QPushButton("Connect")
         v_layout.addWidget(self.switch, alignment=Qt.AlignmentFlag.AlignCenter)
-
-        self.mouse_controller = pynput.mouse.Controller()
 
     def on_connected(self, new):
         if new is None:
@@ -122,7 +119,7 @@ class ClientWindow(QWidget):
                         if event.__contains__("keyboard"):
                             key_press_performer(event, self)
                         else:
-                            mouse_event_performer(event, zero, self.mouse_controller)
+                            mouse_event_performer(event, zero)
 
     def release_shortcut(self):
         keyboard.release("ctrl")

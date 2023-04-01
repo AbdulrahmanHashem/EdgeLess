@@ -17,21 +17,35 @@ class KeyboardHandler:
         self.session_on = False
 
     def key_handler(self, event: keyboard.KeyboardEvent):
+        print(f"keyboard"
+              f",|{event.event_type}"
+              f",|{event.scan_code}"
+              f",|{event.name}"
+              f",|{event.time}"
+              f",|{event.device}"
+              f",|{event.modifiers}"
+              f",|{event.is_keypad};|")
+
+        event_name = event.name
+        if event.name == "shift":
+            event_name = "left shift"
+
         self.context.server. \
-            send_data(
-            f"keyboard,|{event.event_type}"
-            f",|{event.scan_code}"
-            f",|{event.name}"
-            f",|{event.time}"
-            f",|{event.device}"
-            f",|{event.modifiers}"
-            f",|{event.is_keypad};|")
+            send_data(f"keyboard"
+                      f",|{event.event_type}"
+                      f",|{event.scan_code}"
+                      f",|{event_name.lower() if event_name != 'decimal' else '.'}"
+                      f",|{event.time}"
+                      f",|{event.device}"
+                      f",|{event.modifiers}"
+                      f",|{event.is_keypad};|")
 
         if event.name == "*" and self.last_pressed == "ctrl":
             self.context.stop_listening_to_controls()
             self.last_pressed = event.name
 
         self.last_pressed = event.name
+
 
 def key_press_performer(data, context):
     """ Keyboard Key Events executor """
@@ -40,7 +54,6 @@ def key_press_performer(data, context):
         if not context.last_time == float(time):
             context.last_time = float(time)
             keyboard.send(name, True, False) if event_type == keyboard.KEY_DOWN else keyboard.send(name, False, True)
-
             if name == "*" and context.last_pressed == "ctrl":
                 keyboard.release("ctrl")
                 keyboard.release("*")
