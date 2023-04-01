@@ -27,6 +27,8 @@ class MouseHandler:
     def on_click(self, x, y, button, down):
         down = 'down' if down else 'up'
         button = str(button)[7:]
+        if button == "x1":
+            button = "x"
         self.context.server.send_data(f"ButtonEvent,|{button},|{down};|")
         return True
 
