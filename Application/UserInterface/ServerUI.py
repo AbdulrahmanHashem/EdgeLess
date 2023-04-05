@@ -87,7 +87,7 @@ class ServerWindow(QWidget):
         self.keyboard_handler = KeyboardHandler(self)
         self.mouse_handler = MouseHandler(self)
 
-        self.session = threading.Event()
+        # self.session = threading.Event()
 
         self.connect_thread: threading.Thread | None = None
         self.mouse_thread: threading.Thread | None = None
@@ -131,16 +131,12 @@ class ServerWindow(QWidget):
         self.keyboard_handler.start_keyboard()
         self.mouse_handler.start_mouse()
 
-        while not self.session.is_set():
-            pass
-
     def stop_listening_to_controls(self):
         if keyboard._hotkeys.__contains__("ctrl+*"):
             keyboard.remove_hotkey("ctrl+*")
 
         self.keyboard_handler.stop_keyboard()
         self.mouse_handler.stop_mouse()
-        self.session.set()
 
         keyboard.add_hotkey("ctrl+*", self.start_session)
 
@@ -151,7 +147,6 @@ class ServerWindow(QWidget):
 
         if self.keyboard_handler.session_on and self.mouse_handler.session_on:
             self.stop_listening_to_controls()
-            # self.server.client_disconnection = False
 
         if (self.keyboard_handler.session_on and self.mouse_handler.session_on) is False:
             if not self.server.connected.value:
@@ -161,7 +156,6 @@ class ServerWindow(QWidget):
                 self.mouse_thread.join()
 
             try:
-                self.session.clear()
                 self.mouse_thread = threading.Thread(target=self.start_listening_to_controls)
                 self.mouse_thread.start()
                 print("Session Start")
