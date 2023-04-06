@@ -20,7 +20,7 @@ class KeyboardHandler:
         msg = f"keyboard" \
               f",|{event.event_type}" \
               f",|{event.scan_code}" \
-              f",|{event.name.lower() if event.name != 'decimal' else '.'}" \
+              f",|{event.name if event.name != 'decimal' else '.'}" \
               f",|{event.time},|{event.device}" \
               f",|{event.modifiers}" \
               f",|{event.is_keypad};|"
@@ -40,12 +40,13 @@ def key_press_performer(data, context):
         event, event_type, scan_code, name, time, device, modifiers, is_keypad = data.split(",|")
         if not context.last_time == float(time):
             context.last_time = float(time)
-            print(modifiers)
 
-            is_keypad = True if is_keypad == "True" else False
-            kevent = keyboard.KeyboardEvent(event_type, int(scan_code), name, float(time), None, is_keypad)
+            if is_keypad == "False":
+                key_event = keyboard.KeyboardEvent(event_type, int(scan_code), name, float(time), None, False)
+                keyboard.play([key_event])
+            else:
+                keyboard.send(name, True, False) if event_type == keyboard.KEY_DOWN else keyboard.send(name, False, True)
 
-            keyboard.play([kevent])
             if name == "*" and context.last_pressed == "ctrl":
                 keyboard.release("ctrl")
                 keyboard.release("*")
