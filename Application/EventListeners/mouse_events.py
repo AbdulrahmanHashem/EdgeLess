@@ -46,7 +46,7 @@ class MouseHandler:
 
 def mouse_event_performer(data, zero):
     """ Mouse event executor """
-    if data.__contains__("Move"):
+    if "Move" in data:
         try:
             event, x, y = data.split(",|")
             ox, oy = zero.split(",|")
@@ -58,13 +58,10 @@ def mouse_event_performer(data, zero):
         except Exception as e:
             print(f"Move Event Catch : {e}")
 
-    elif data.__contains__("Button"):
+    elif "Button" in data:
         try:
             event, button, down = data.split(",|")
-            mouse.play([mouse.ButtonEvent(
-                event_type=down.strip(),
-                button=button.strip(),
-                time=0)], 0)
+            mouse.play([mouse.ButtonEvent(event_type=down.strip(), button=button.strip(), time=0)])
 
         except Exception as e:
             print(f"Button Event Catch : {e}")
