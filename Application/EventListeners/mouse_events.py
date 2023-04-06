@@ -1,6 +1,7 @@
 from typing import Optional
 
 import mouse
+import pyautogui
 from pynput.mouse import Listener
 
 
@@ -30,12 +31,15 @@ class MouseHandler:
         down = 'down' if down else 'up'
         button = str(button)[7:]
         if button == "x1":
-            button = "x"
+            button = "primary"
+        elif button == "x2":
+            button = "secondary"
+
         self.context.server.send_data(f"ButtonEvent,|{button},|{down};|")
         return True
 
     def on_scroll(self, x, y, is_h, delta):
-        self.context.server.send_data(f"WheelEvent,|{is_h},|{delta};|")
+        self.context.server.send_data(f"WheelEvent,|{x},|{y},|{is_h},|{delta};|")
         return True
 
     def on_move(self, x, y):
@@ -60,8 +64,9 @@ def mouse_event_performer(data, zero):
 
     elif "Button" in data:
         try:
-            event, button, down = data.split(",|")
-            mouse.play([mouse.ButtonEvent(event_type=down.strip(), button=button.strip(), time=0)])
+            event, x, y, button, down = data.split(",|")
+            pyautogui.mouseDown(x, y, button) if down == "down" else pyautogui.mouseUp(x, y, button)
+            # mouse.play([mouse.ButtonEvent(event_type=down.strip(), button=button.strip(), time=0)])
 
         except Exception as e:
             print(f"Button Event Catch : {e}")
@@ -69,9 +74,7 @@ def mouse_event_performer(data, zero):
     else:
         try:
             event, is_h, delta = data.split(",|")
-            mouse.play([mouse.WheelEvent(
-                delta=float(delta.strip()),
-                time=0)])
+            mouse.play([mouse.WheelEvent(delta=float(delta.strip()), time=0)])
 
         except Exception as e:
             print(f"Wheel Event Catch : {e}")
