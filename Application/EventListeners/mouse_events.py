@@ -31,9 +31,7 @@ class MouseHandler:
         down = 'down' if down else 'up'
         button = str(button)[7:]
         if button == "x1":
-            button = "primary"
-        elif button == "x2":
-            button = "secondary"
+            button = "x"
 
         self.context.server.send_data(f"ButtonEvent,|{button},|{down};|")
         return True
