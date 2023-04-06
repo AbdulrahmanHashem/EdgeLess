@@ -35,7 +35,7 @@ class MouseHandler:
         elif button == "x2":
             button = "secondary"
 
-        self.context.server.send_data(f"ButtonEvent,|{x},|{y},|{button},|{down};|")
+        self.context.server.send_data(f"ButtonEvent,|{button},|{down};|")
         return True
 
     def on_scroll(self, x, y, is_h, delta):
@@ -57,15 +57,15 @@ def mouse_event_performer(data, zero):
             x = int(ox) - int(x)
             y = int(oy) - int(y)
             cx, xy = mouse.get_position()
-            mouse.play([mouse.MoveEvent(x=cx - x, y=xy - y, time=0)], 0)
+            mouse.play([mouse.MoveEvent(x=cx - x, y=xy - y, time=0)])
 
         except Exception as e:
             print(f"Move Event Catch : {e}")
 
     elif "Button" in data:
         try:
-            event, x, y, button, down = data.split(",|")
-            pyautogui.mouseDown(x, y, button) if down == "down" else pyautogui.mouseUp(x, y, button)
+            event, button, down = data.split(",|")
+            mouse.play([mouse.ButtonEvent(event_type=down, button=button, time=0)])
 
         except Exception as e:
             print(f"Button Event Catch : {e}")
