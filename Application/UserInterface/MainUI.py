@@ -12,8 +12,10 @@ class EdgeLess(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Edge Less")
-        self.setMinimumWidth(350)
+        self.setMinimumWidth(450)
         self.setMinimumHeight(250)
+        self.setMaximumWidth(450)
+        self.setMaximumHeight(250)
 
         self.main_widget = QWidget()
         self.setCentralWidget(self.main_widget)

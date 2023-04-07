@@ -7,8 +7,8 @@ rex = re.compile(r'^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4]
 
 
 class Server(socket.socket):
-    HOST = str(socket.gethostbyname_ex(socket.gethostname())[2][-1])  # Use all available interfaces
-    PORT = 9999  # Arbitrary non-privileged port
+    HOST = "0.0.0.0"  # Use all available interfaces
+    PORT = 0  # Arbitrary non-privileged port
     BUFFER_SIZE = 1024 * 2
 
     def __init__(self, context, fam=socket.AF_INET, ty=socket.SOCK_STREAM):
