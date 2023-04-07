@@ -1,10 +1,12 @@
 from PyQt6 import QtGui
 from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QWindowStateChangeEvent
 from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QRadioButton
 
 from Application.UserInterface.ClientUI import ClientWindow
 from Application.UserInterface.ServerUI import ServerWindow
-
+import pystray
+from PIL import Image
 
 class EdgeLess(QMainWindow):
     def __init__(self):
@@ -55,3 +57,20 @@ class EdgeLess(QMainWindow):
         self.client_window.disconnect()
         super().closeEvent(a0)
 
+    def event(self, event):
+        if isinstance(event, QWindowStateChangeEvent):
+            if self.windowState() & Qt.WindowState.WindowMinimized:
+                self.hide()
+                def show(icon, menu):
+                    self.showNormal()
+                    icon.stop()
+
+                def close():
+                    self.close()
+                    icon.stop()
+
+                image = Image.open("Resources/EdgeLess_Logo.ico")
+                menu = pystray.Menu(pystray.MenuItem('Show', show), pystray.MenuItem('Exit', close))
+                icon = pystray.Icon('EdgeLess', image, "EdgeLess", menu=menu, doubleclick=show)
+                icon.run()
+        return super().event(event)
