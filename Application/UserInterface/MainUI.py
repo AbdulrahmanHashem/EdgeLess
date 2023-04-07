@@ -1,7 +1,8 @@
 from PyQt6 import QtGui
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QWindowStateChangeEvent
-from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QRadioButton
+# from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QWindowStateChangeEvent, QAction
+from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QRadioButton, QMenu
 
 from Application.UserInterface.ClientUI import ClientWindow
 from Application.UserInterface.ServerUI import ServerWindow
@@ -63,6 +64,7 @@ class EdgeLess(QMainWindow):
         if isinstance(event, QWindowStateChangeEvent):
             if self.windowState() & Qt.WindowState.WindowMinimized:
                 self.hide()
+
                 def show(icon, menu):
                     self.showNormal()
                     icon.stop()
