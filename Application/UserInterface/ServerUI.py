@@ -71,23 +71,23 @@ class ServerWindow(QWidget):
             """ On Connected True"""
             self.status.setText(f"Connected to {self.server.client_address[0]} : {self.server.client_address[1]}")
 
-            keyboard.add_hotkey("ctrl+*", self.start_session)
+            keyboard.add_hotkey(self.master_window.settings.get_setting("session_start"), self.start_session)
 
         else:
             """ On Connected False"""
             self.status.setText("")
             self.start.setText("Start Server")
 
-    def __init__(self):
+    def __init__(self, parent):
         super().__init__()
+        self.master_window = parent
+
         self.setup_ui()
 
         self.server = Server(self)
 
         self.keyboard_handler = KeyboardHandler(self)
         self.mouse_handler = MouseHandler(self)
-
-        # self.session = threading.Event()
 
         self.connect_thread: threading.Thread | None = None
         self.mouse_thread: threading.Thread | None = None

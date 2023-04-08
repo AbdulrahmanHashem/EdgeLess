@@ -47,7 +47,8 @@ def key_press_performer(data, context):
             else:
                 keyboard.send(name, True, False) if event_type == keyboard.KEY_DOWN else keyboard.send(name, False, True)
 
-            if name == "*" and context.last_pressed == "ctrl":
+            shortcut = context.master_window.settings.get_setting("session_start").split("+")
+            if name == shortcut[1] and context.last_pressed == shortcut[0]:
                 keyboard.release("ctrl")
                 keyboard.release("*")
             context.last_pressed = name

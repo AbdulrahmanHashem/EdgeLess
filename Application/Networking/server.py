@@ -7,9 +7,8 @@ rex = re.compile(r'^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4]
 
 
 class Server(socket.socket):
-    HOST = "0.0.0.0"  # Use all available interfaces
-    PORT = 0  # Arbitrary non-privileged port
-    BUFFER_SIZE = 1024 * 2
+    HOST = "0.0.0.0"
+    PORT = 0
 
     def __init__(self, context, fam=socket.AF_INET, ty=socket.SOCK_STREAM):
         super().__init__(fam, ty)
@@ -64,7 +63,6 @@ class Server(socket.socket):
         except Exception as e:
             print(f"Send Data Catch : {e}")
             self.client_disconnection = True
-            # self.context.disconnect()
             self.context.stop_listening_to_controls()
             return False
 

@@ -9,10 +9,10 @@ rex = re.compile(r'^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4]
 class Client(socket.socket):
     HOST = "0.0.0.0"
     PORT = 0
-    BUFFER_SIZE = 1024 * 2
 
     def __init__(self, context, fam=socket.AF_INET, ty=socket.SOCK_STREAM):
         super().__init__(fam, ty)
+        self.BUFFER_SIZE = context.master_window.settings.get_setting("BUFFER_SIZE")
         self.context = context
 
         self.connected = Observable()

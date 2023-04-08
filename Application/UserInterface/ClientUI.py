@@ -40,21 +40,25 @@ class ClientWindow(QWidget):
 
     def on_connected(self, new):
         if new is None:
+            """ On Connected None"""
             self.switch.setText("Connecting")
             self.state.setText(f"Attempting to connect to {self.client.HOST}, {self.client.PORT}")
 
         elif new:
+            """ On Connected True"""
             self.switch.setText("Disconnect")
             self.state.setText(f"{self.client.HOST} : {self.client.PORT}")
 
             self.start_session()
 
         else:
+            """ On Connected False"""
             self.switch.setText("Connect")
             self.state.setText(f"")
 
-    def __init__(self):
+    def __init__(self, parent):
         super().__init__()
+        self.master_window = parent
         self.setup_ui()
 
         self.mouse_thread = None
