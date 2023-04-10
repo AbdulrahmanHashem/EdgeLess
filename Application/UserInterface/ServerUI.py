@@ -132,13 +132,15 @@ class ServerWindow(QWidget):
         self.mouse_handler.start_mouse()
 
     def stop_listening_to_controls(self):
-        if keyboard._hotkeys.__contains__("ctrl+*"):
-            keyboard.remove_hotkey("ctrl+*")
+        shortcut = self.master_window.settings.get_setting("Session Start")
+
+        if keyboard._hotkeys.__contains__(shortcut):
+            keyboard.remove_hotkey(shortcut)
 
         self.keyboard_handler.stop_keyboard()
         self.mouse_handler.stop_mouse()
 
-        keyboard.add_hotkey("ctrl+*", self.start_session)
+        keyboard.add_hotkey(shortcut, self.start_session)
 
     def start_session(self) -> None:
         if self.server.client_disconnection and self.server.connected.value:

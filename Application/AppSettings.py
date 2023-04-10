@@ -5,8 +5,8 @@ from PyQt6.QtWidgets import QWidget
 
 DefaultSettings: dict = {
     "mode": 1,  # 1 = Server 2 = Client
-    "session_start": "ctrl+*",
-    "BUFFER_SIZE": 2048
+    "Session Start": "ctrl+*",
+    "Buffer Size": 2048
 }
 
 Settings_File = "Resources/Settings.json"

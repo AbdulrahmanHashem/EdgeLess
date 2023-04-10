@@ -27,7 +27,8 @@ class KeyboardHandler:
 
         self.context.server.send_data(msg)
 
-        if event.name == "*" and self.last_pressed == "ctrl":
+        shortcut = self.context.master_window.settings.get_setting("Session Start").split("+")
+        if event.name == shortcut[1] and self.last_pressed == shortcut[0]:
             self.context.stop_listening_to_controls()
             self.last_pressed = event.name
 
@@ -47,7 +48,7 @@ def key_press_performer(data, context):
             else:
                 keyboard.send(name, True, False) if event_type == keyboard.KEY_DOWN else keyboard.send(name, False, True)
 
-            shortcut = context.master_window.settings.get_setting("session_start").split("+")
+            shortcut = context.master_window.settings.get_setting("Session Start").split("+")
             if name == shortcut[1] and context.last_pressed == shortcut[0]:
                 keyboard.release("ctrl")
                 keyboard.release("*")

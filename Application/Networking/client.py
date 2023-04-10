@@ -12,7 +12,7 @@ class Client(socket.socket):
 
     def __init__(self, context, fam=socket.AF_INET, ty=socket.SOCK_STREAM):
         super().__init__(fam, ty)
-        self.BUFFER_SIZE = context.master_window.settings.get_setting("BUFFER_SIZE")
+        self.BUFFER_SIZE = context.master_window.settings.get_setting("Buffer Size")
         self.context = context
 
         self.connected = Observable()

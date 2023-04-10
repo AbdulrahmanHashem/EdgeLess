@@ -1,6 +1,5 @@
 from PyQt6 import QtGui
 from PyQt6.QtCore import Qt
-# from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QWindowStateChangeEvent
 from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QRadioButton
 
@@ -10,6 +9,7 @@ import pystray
 from PIL import Image
 
 from Application.AppSettings import AppSettings
+from Application.UserInterface.SettingsUI import SettingsUI
 
 
 class EdgeLess(QMainWindow):
@@ -28,6 +28,8 @@ class EdgeLess(QMainWindow):
         self.main_widget.setLayout(self.H_layout)
 
         self.settings = AppSettings()  # settings Window
+        # self.settings_ui = SettingsUI(self)
+        # self.settings_ui.show()
 
         self.create_radio_buttons_group()               # Radio Buttons             |*|   |
         self.create_client_and_server_controls_group()  # Client & Server Controls  | |***|
