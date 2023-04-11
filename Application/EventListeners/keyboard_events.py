@@ -12,6 +12,10 @@ class KeyboardHandler:
         keyboard.hook(self.key_handler, suppress=True)
         self.session_on = True
 
+        shortcut = self.context.master_window.settings.get_setting("Session Start").split("+")
+        for sc in shortcut:
+            keyboard.release(sc)
+
     def stop_keyboard(self):
         keyboard.unhook_all()
         self.session_on = False
@@ -28,7 +32,8 @@ class KeyboardHandler:
         self.context.server.send_data(msg)
 
         shortcut = self.context.master_window.settings.get_setting("Session Start").split("+")
-        if event.name == shortcut[1] and self.last_pressed == shortcut[0]:
+
+        if event.name == shortcut[1].lower() and self.last_pressed == shortcut[0].lower():
             self.context.stop_listening_to_controls()
             self.last_pressed = event.name
 
@@ -48,10 +53,6 @@ def key_press_performer(data, context):
             else:
                 keyboard.send(name, True, False) if event_type == keyboard.KEY_DOWN else keyboard.send(name, False, True)
 
-            # shortcut = context.master_window.settings.get_setting("Session Start").split("+")
-            # if name == shortcut[1] and context.last_pressed == shortcut[0]:
-            #     keyboard.release(shortcut[1])
-            #     keyboard.release(shortcut[0])
             context.last_pressed = name
     except Exception as e:
         print(f"keyboard : {e}")

@@ -109,13 +109,11 @@ class ClientWindow(QWidget):
             if data == "" or data.__contains__("clo"):
                 self.client.client_disconnection = True
                 self.disconnect()
-                # self.release_shortcut()
+                self.release_shortcut()
                 return
 
             elif "new" in data:
-                print(data)
                 sign, x, y, new_shortcut = data.split(",|")
-                print(sign, x, y, new_shortcut)
                 self.master_window.settings.update_setting("Session Start", new_shortcut)
                 self.release_shortcut()
                 zero = [x, y]
@@ -131,8 +129,8 @@ class ClientWindow(QWidget):
 
     def release_shortcut(self):
         shortcut = self.master_window.settings.get_setting("Session Start").split("+")
-        keyboard.release(shortcut[0])
-        keyboard.release(shortcut[1])
+        for sc in shortcut:
+            keyboard.release(sc)
 
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
         self.disconnect()

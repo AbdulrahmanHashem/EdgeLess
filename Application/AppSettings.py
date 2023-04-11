@@ -46,7 +46,6 @@ class AppSettings:
             self.load_settings()
 
     def update_setting(self, key, value):
-        print(value)
         self._settings[key] = value
         self.update_settings_file()
 
