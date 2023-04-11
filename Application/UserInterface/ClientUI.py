@@ -109,12 +109,16 @@ class ClientWindow(QWidget):
             if data == "" or data.__contains__("clo"):
                 self.client.client_disconnection = True
                 self.disconnect()
-                self.release_shortcut()
+                # self.release_shortcut()
                 return
 
-            elif data.__contains__("new"):
+            elif "new" in data:
+                print(data)
+                sign, x, y, new_shortcut = data.split(",|")
+                print(sign, x, y, new_shortcut)
+                self.master_window.settings.update_setting("Session Start", new_shortcut)
                 self.release_shortcut()
-                zero = data[13:]
+                zero = [x, y]
 
             if data:
                 events = data.split(";|")
@@ -126,8 +130,9 @@ class ClientWindow(QWidget):
                             mouse_event_performer(event, zero)
 
     def release_shortcut(self):
-        keyboard.release("ctrl")
-        keyboard.release("*")
+        shortcut = self.master_window.settings.get_setting("Session Start").split("+")
+        keyboard.release(shortcut[0])
+        keyboard.release(shortcut[1])
 
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
         self.disconnect()

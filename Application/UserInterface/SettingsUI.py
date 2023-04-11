@@ -18,6 +18,20 @@ class SettingsUI(QWidget):
 
         self.fill_settings()
 
+        self.settings_widget_refs["Session Start"].editingFinished.connect(
+            lambda: self.settings.update_setting(
+                "Session Start",
+                get_QWidget_content(self.settings_widget_refs["Session Start"])
+            )
+        )
+
+        self.settings_widget_refs["Buffer Size"].editingFinished.connect(
+            lambda: self.settings.update_setting(
+                "Buffer Size",
+                get_QWidget_content(self.settings_widget_refs["Buffer Size"])
+            )
+        )
+
     def initialize_ui(self):
         self.main_layout = QGridLayout()
         self.setLayout(self.main_layout)
@@ -36,10 +50,6 @@ class SettingsUI(QWidget):
 
             if isinstance(value_widget, QSpinBox):
                 value_widget.setMaximum(10240)
-
-            value_widget.editingFinished.connect(lambda:
-                self.settings.update_setting(widget_key, get_QWidget_content(value_widget))
-            )
 
             self.settings_widget_refs[widget_key] = value_widget
 

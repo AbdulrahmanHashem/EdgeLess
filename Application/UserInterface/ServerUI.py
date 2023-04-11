@@ -71,7 +71,8 @@ class ServerWindow(QWidget):
             """ On Connected True"""
             self.status.setText(f"Connected to {self.server.client_address[0]} : {self.server.client_address[1]}")
 
-            keyboard.add_hotkey(self.master_window.settings.get_setting("session_start"), self.start_session)
+            shortcut = self.master_window.settings.get_setting("Session Start")
+            keyboard.add_hotkey(shortcut, self.start_session)
 
         else:
             """ On Connected False"""

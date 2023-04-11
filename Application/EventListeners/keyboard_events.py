@@ -48,10 +48,10 @@ def key_press_performer(data, context):
             else:
                 keyboard.send(name, True, False) if event_type == keyboard.KEY_DOWN else keyboard.send(name, False, True)
 
-            shortcut = context.master_window.settings.get_setting("Session Start").split("+")
-            if name == shortcut[1] and context.last_pressed == shortcut[0]:
-                keyboard.release("ctrl")
-                keyboard.release("*")
+            # shortcut = context.master_window.settings.get_setting("Session Start").split("+")
+            # if name == shortcut[1] and context.last_pressed == shortcut[0]:
+            #     keyboard.release(shortcut[1])
+            #     keyboard.release(shortcut[0])
             context.last_pressed = name
     except Exception as e:
         print(f"keyboard : {e}")

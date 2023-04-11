@@ -17,7 +17,8 @@ class MouseHandler:
         self.listener = Listener(on_click=self.on_click, on_scroll=self.on_scroll, on_move=self.on_move, suppress=True)
 
         x, y = mouse.get_position()
-        self.context.server.send_data(f"new session,|{x},|{y}")
+        self.context.server.send_data(f"new session,|{x},|{y},|"
+                                      f"{self.context.master_window.settings.get_setting('Session Start')}")
 
         self.session_on = True
         self.listener.run()
@@ -51,9 +52,8 @@ def mouse_event_performer(data, zero):
     if "Move" in data:
         try:
             event, x, y = data.split(",|")
-            ox, oy = zero.split(",|")
-            x = int(ox) - int(x)
-            y = int(oy) - int(y)
+            x = int(zero[0]) - int(x)
+            y = int(zero[1]) - int(y)
             cx, xy = mouse.get_position()
             mouse.play([mouse.MoveEvent(x=cx - x, y=xy - y, time=0)])
 
