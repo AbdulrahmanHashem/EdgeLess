@@ -1,5 +1,5 @@
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QWidget, QKeySequenceEdit, QSpinBox, QVBoxLayout, QGridLayout, QLabel
+from PyQt6.QtWidgets import QWidget, QKeySequenceEdit, QSpinBox, QGridLayout, QLabel
 
 from Application.Utils.Utils import set_QWidget_content, get_QWidget_content
 
