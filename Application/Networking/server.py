@@ -12,16 +12,14 @@ class Server(socket.socket):
 
     def __init__(self, context, fam=socket.AF_INET, ty=socket.SOCK_STREAM):
         super().__init__(fam, ty)
-        self.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # Enable reuse of the same address
         self.context = context
+        self.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # Enable reuse of the same address
 
-        # connection state
         self.connected = Observable()
         self.connected.add_observer(self.context.on_connected)
 
         self.client_socket = None
         self.client_address = None
-        self.last_sent = ""
         self.client_disconnection = False
 
     def run(self):
@@ -58,7 +56,6 @@ class Server(socket.socket):
         try:
             if self.connected.value:
                 self.client_socket.sendall(data.encode())
-                self.last_sent = data
                 return True
         except Exception as e:
             print(f"Send Data Catch : {e}")

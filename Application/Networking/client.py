@@ -16,9 +16,9 @@ class Client(socket.socket):
         self.BUFFER_SIZE = self.context.master_window.settings.get_setting("Buffer Size")
 
         self.connected = Observable()
-        self.connected.value = False
         self.connected.add_observer(self.context.on_connected)
 
+        self.connected.value = False
         self.client_disconnection = False
 
     def connect_now(self):
