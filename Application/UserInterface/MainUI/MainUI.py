@@ -1,17 +1,15 @@
-from PyQt6 import QtGui, QtCore
+from PyQt6 import QtGui
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QWindowStateChangeEvent, QMouseEvent, QIcon, QRegion, QAction
-from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QRadioButton, QLabel, QPushButton, \
-    QStyle, QSizePolicy, QFrame
+from PyQt6.QtGui import QWindowStateChangeEvent
+from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QRadioButton
 
-from Application.UserInterface.ClientUI import ClientWindow
-from Application.UserInterface.CustomTitleBar import CustomTitleBar
-from Application.UserInterface.ServerUI import ServerWindow
+from Application.UserInterface.MainUI.ClientUI import ClientWindow
+from Application.Utils.CustomTitleBar import CustomTitleBar
+from Application.UserInterface.MainUI.ServerUI import ServerWindow
 import pystray
 from PIL import Image
 
-from Application.AppSettings import AppSettings
-from Application.UserInterface.SettingsUI import SettingsUI
+from Application.UserInterface.SettingsUI.AppSettings import AppSettings
 
 
 class EdgeLess(QMainWindow):
@@ -37,7 +35,6 @@ class EdgeLess(QMainWindow):
             self.server.click()
         else:
             self.client.click()
-
         # self.rect().width()
         # self.rect().height()
         # region = QRegion(
@@ -87,11 +84,6 @@ class EdgeLess(QMainWindow):
         else:
             self.settings.update_setting("mode", 2)
 
-    def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
-        self.server_window.disconnect()
-        self.client_window.disconnect()
-        super().closeEvent(a0)
-
     def event(self, event):
         if isinstance(event, QWindowStateChangeEvent):
             if self.windowState() & Qt.WindowState.WindowMinimized:
@@ -110,3 +102,8 @@ class EdgeLess(QMainWindow):
                 icon = pystray.Icon('EdgeLess', image, "EdgeLess", menu=menu, doubleclick=show)
                 icon.run()
         return super().event(event)
+
+    def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
+        self.server_window.disconnect()
+        self.client_window.disconnect()
+        super().closeEvent(a0)

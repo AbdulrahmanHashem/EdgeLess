@@ -9,6 +9,7 @@ from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QTextEdit
 from Application.EventListeners.keyboard_events import key_press_performer
 from Application.EventListeners.mouse_events import mouse_event_performer
 from Application.Networking.client import Client
+from Application.UserInterface.LoggingUI.Logging import log_to_logging_file
 
 
 class ClientWindow(QWidget):
@@ -84,7 +85,6 @@ class ClientWindow(QWidget):
             self.disconnect()
 
     def connect(self):
-
         self.client.__init__(self)
         self.connecting_thread = threading.Thread(target=self.client.connect_now)
         self.connecting_thread.start()
@@ -99,33 +99,38 @@ class ClientWindow(QWidget):
             self.mouse_thread = threading.Thread(target=self.receive_control_events)
             self.mouse_thread.start()
         except Exception as e:
-            print(f"Start Catch : {e}")
+            log_to_logging_file(f"Start Catch : {e}") if self.master_window.settings.get_setting(
+                "Logging") else None
 
     def receive_control_events(self):
-        zero = ""
-        while not self.controller.is_set():
-            data = self.client.receive()
+        try:
+            zero = ""
+            while not self.controller.is_set():
+                data = self.client.receive()
 
-            if data == "" or data.__contains__("clo"):
-                self.client.client_disconnection = True
-                self.disconnect()
-                self.release_shortcut()
-                return
+                if data == "" or data.__contains__("clo"):
+                    self.client.client_disconnection = True
+                    self.disconnect()
+                    self.release_shortcut()
+                    return
 
-            elif "new" in data:
-                sign, x, y, new_shortcut = data.split(",|")
-                self.master_window.settings.update_setting("Session Start", new_shortcut)
-                self.release_shortcut()
-                zero = [x, y]
+                elif "new" in data:
+                    sign, x, y, new_shortcut = data.split(",|")
+                    self.master_window.settings.update_setting("Session Start", new_shortcut)
+                    self.release_shortcut()
+                    zero = [x, y]
 
-            if data:
-                events = data.split(";|")
-                for event in events:
-                    if not event == "":
-                        if event.__contains__("keyboard"):
-                            key_press_performer(event, self)
-                        else:
-                            mouse_event_performer(event, zero)
+                if data:
+                    events = data.split(";|")
+                    for event in events:
+                        if not event == "":
+                            if event.__contains__("keyboard"):
+                                key_press_performer(event, self)
+                            else:
+                                mouse_event_performer(event, zero, self)
+        except Exception as e:
+            log_to_logging_file(f"Receive Control Events Catch : {e}") if self.master_window.settings.get_setting(
+                "Logging") else None
 
     def release_shortcut(self):
         shortcut = self.master_window.settings.get_setting("Session Start").split("+")

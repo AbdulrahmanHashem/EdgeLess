@@ -1,8 +1,9 @@
 from typing import Optional
 
 import mouse
-import pyautogui
 from pynput.mouse import Listener
+
+from Application.UserInterface.LoggingUI.Logging import log_to_logging_file
 
 
 class MouseHandler:
@@ -47,7 +48,7 @@ class MouseHandler:
         return True
 
 
-def mouse_event_performer(data, zero):
+def mouse_event_performer(data, zero, context):
     """ Mouse event executor """
     if "Move" in data:
         try:
@@ -58,7 +59,7 @@ def mouse_event_performer(data, zero):
             mouse.play([mouse.MoveEvent(x=cx - x, y=xy - y, time=0)])
 
         except Exception as e:
-            print(f"Move Event Catch : {e}")
+            log_to_logging_file(f"Move Event Catch : {e}") if context.master_window.settings.get_setting("Logging") else None
 
     elif "Button" in data:
         try:
@@ -66,7 +67,8 @@ def mouse_event_performer(data, zero):
             mouse.play([mouse.ButtonEvent(event_type=down, button=button, time=0)])
 
         except Exception as e:
-            print(f"Button Event Catch : {e}")
+            log_to_logging_file(f"Button Event Catch : {e}") if context.master_window.settings.get_setting(
+                "Logging") else None
 
     else:
         try:
@@ -74,4 +76,5 @@ def mouse_event_performer(data, zero):
             mouse.play([mouse.WheelEvent(delta=float(delta.strip()), time=0)])
 
         except Exception as e:
-            print(f"Wheel Event Catch : {e}")
+            log_to_logging_file(f"Wheel Event Catch : {e}") if context.master_window.settings.get_setting(
+                "Logging") else None

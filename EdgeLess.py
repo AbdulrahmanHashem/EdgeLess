@@ -3,8 +3,8 @@ import sys
 
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QApplication
-from Application.UserInterface.MainUI import EdgeLess
 
+from Application.UserInterface.MainUI.MainUI import EdgeLess
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

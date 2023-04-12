@@ -1,6 +1,7 @@
 import re
 import socket
 
+from Application.UserInterface.LoggingUI.Logging import log_to_logging_file
 from Application.Utils.Observation import Observable
 
 rex = re.compile(r'^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$')
@@ -35,8 +36,9 @@ class Client(socket.socket):
                 self.context.state.setText("Incorrect Address Format.")
                 return
         except Exception as e:
-            print(f"Connect Now Catch : {e}"
-                  f"\n      You Likely Stopped the Client Before a Successful Connection")
+            log_to_logging_file(f"Connect Now Catch : {e}"
+                                f"You Likely Stopped the Client Before a Successful Connection") \
+                if self.context.master_window.settings.get_setting("Logging") else None
             self.connected.value = False
 
     def receive(self) -> str:
@@ -44,7 +46,8 @@ class Client(socket.socket):
             data: str = self.recv(self.BUFFER_SIZE).decode()
             return data
         except socket.error as e:
-            print(f"Receive Catch : {e}")
+            log_to_logging_file(f"Receive Catch : {e}") if self.context.master_window.settings.get_setting(
+                "Logging") else None
             self.client_disconnection = True
             self.context.disconnect()
             self.context.release_shortcut()
@@ -55,10 +58,12 @@ class Client(socket.socket):
         try:
             self.shutdown(socket.SHUT_RDWR)
         except Exception as e:
-            print(f"Client Shutdown Catch : {e}")
+            log_to_logging_file(f"Client Shutdown Catch : {e}") if self.context.master_window.settings.get_setting(
+                "Logging") else None
 
         try:
             self.close()
             self.connected.value = False
         except Exception as e:
-            print(f"Client Close Catch : {e}")
+            log_to_logging_file(f"Client Close Catch : {e}") if self.context.master_window.settings.get_setting(
+                "Logging") else None

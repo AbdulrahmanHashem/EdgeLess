@@ -1,5 +1,7 @@
 import keyboard
 
+from Application.UserInterface.LoggingUI.Logging import log_to_logging_file
+
 
 class KeyboardHandler:
     def __init__(self, context):
@@ -55,4 +57,4 @@ def key_press_performer(data, context):
 
             context.last_pressed = name
     except Exception as e:
-        print(f"keyboard : {e}")
+        log_to_logging_file(f"keyboard : {e}") if context.master_window.settings.get_setting("Logging") else None

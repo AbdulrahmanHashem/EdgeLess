@@ -2,7 +2,8 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon, QMouseEvent
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QPushButton, QStyle, QSizePolicy, QLabel
 
-from Application.UserInterface.SettingsUI import SettingsUI
+from Application.UserInterface.LoggingUI.Logging import log_to_logging_file
+from Application.UserInterface.SettingsUI.SettingsUI import SettingsUI
 
 
 class CustomTitleBar(QWidget):
@@ -88,7 +89,7 @@ class CustomTitleBar(QWidget):
                 self.settings_ui = SettingsUI(self.parent)
                 self.settings_ui.show()
         except Exception as e:
-            print(e)
+            log_to_logging_file(f"Open Settings Catch : {e}") if self.parent.settings.get_setting("Logging") else None
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
         """Handle mouse press events on the title bar"""

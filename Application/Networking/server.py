@@ -1,6 +1,7 @@
 import re
 import socket
 
+from Application.UserInterface.LoggingUI.Logging import log_to_logging_file
 from Application.Utils.Observation import Observable
 
 rex = re.compile(r'^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$')
@@ -35,7 +36,7 @@ class Server(socket.socket):
                 self.context.status.setText("Incorrect Address Format.")
                 return False
         except Exception as e:
-            print(f"Server Run Catch : {e}")
+            log_to_logging_file(f"Server Run Catch : {e}") if self.context.master_window.settings.get_setting("Logging") else None
             return False
 
     def connect_now(self):
@@ -46,8 +47,9 @@ class Server(socket.socket):
             self.connected.value = True
 
         except Exception as e:
-            print(f"Server 'Connect Now' Catch : {e}"
-                  f"\n      You Likely Stopped the Server Before a Successful Connection")
+            log_to_logging_file(f"Server 'Connect Now' Catch : {e} "
+                                f"You Likely Stopped the Server Before a Successful Connection") \
+                if self.context.master_window.settings.get_setting("Logging") else None
             self.context.disconnect()
             return None
 
@@ -58,7 +60,8 @@ class Server(socket.socket):
                 self.client_socket.sendall(data.encode())
                 return True
         except Exception as e:
-            print(f"Send Data Catch : {e}")
+            log_to_logging_file(f"Send Data Catch : {e}") if self.context.master_window.settings.get_setting(
+                "Logging") else None
             self.client_disconnection = True
             self.context.stop_listening_to_controls()
             return False
@@ -67,11 +70,14 @@ class Server(socket.socket):
         try:
             self.shutdown(socket.SHUT_RDWR)
         except Exception as e:
-            print(f"Server Shutdown Catch : {e}")
+            log_to_logging_file(f"Server Shutdown Catch : {e}") if self.context.master_window.settings.get_setting(
+                "Logging") else None
 
         try:
             self.close()
             self.connected.value = False
-            print("Server Closed Gracefully")
+            log_to_logging_file("Server Closed Gracefully") if self.context.master_window.settings.get_setting(
+                "Logging") else None
         except Exception as e:
-            print(f"Server Stop Catch: {e}")
+            log_to_logging_file(f"Server Stop Catch: {e}") if self.context.master_window.settings.get_setting(
+                "Logging") else None

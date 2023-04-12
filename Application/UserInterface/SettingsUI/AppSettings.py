@@ -1,12 +1,16 @@
 import json
 import os
+from datetime import datetime
 
 from PyQt6.QtWidgets import QWidget
+
+from Application.UserInterface.LoggingUI.Logging import log_to_logging_file
 
 DefaultSettings: dict = {
     "mode": 1,  # 1 = Server 2 = Client
     "Session Start": "ctrl+*",
-    "Buffer Size": 2048
+    "Buffer Size": 2048,
+    "Logging": False
 }
 
 Settings_File = "Resources/Settings.json"
@@ -26,11 +30,13 @@ class AppSettings:
         self._settings: dict or None = None
         self.initialize_settings()
 
+        self.logging = self.get_setting("Logging")
+
     def load_settings(self):
         try:
             self._settings = json.load(open(Settings_File))
         except Exception as e:
-            print(f"Loading Settings Catch : {e}")
+            log_to_logging_file(f"Loading Settings Catch : {e}") if self.get_setting("Logging") else None
 
     def update_settings_file(self) -> bool:
         if os.path.isfile(Settings_File):

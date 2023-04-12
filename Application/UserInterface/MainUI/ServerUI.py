@@ -10,6 +10,7 @@ from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayo
 from Application.EventListeners.keyboard_events import KeyboardHandler
 from Application.EventListeners.mouse_events import MouseHandler
 from Application.Networking.server import Server
+from Application.UserInterface.LoggingUI.Logging import log_to_logging_file
 
 
 class ServerWindow(QWidget):
@@ -109,16 +110,18 @@ class ServerWindow(QWidget):
 
     def connect(self) -> None:
         if self.server.run() is False:
-            return print("UI Connect Error : server run error")
+            return log_to_logging_file("UI Connect Error : server run error") if self.master_window.settings.get_setting(
+                "Logging") else None
 
         if self.server.connected.value:
-            return print("UI Connect Error : Server Is Still Connected")
+            return log_to_logging_file("UI Connect Error : Server Is Still Connected") if self.master_window.settings.get_setting(
+                "Logging") else None
 
         try:
             self.connect_thread = threading.Thread(target=self.server.connect_now)
             self.connect_thread.start()
         except Exception as e:
-            return print(f"UI Connect Catch : {e}")
+            return log_to_logging_file(f"UI Connect Catch : {e}") if self.master_window.settings.get_setting("Logging") else None
 
     def disconnect(self):
         self.start.setEnabled(False)
@@ -153,7 +156,8 @@ class ServerWindow(QWidget):
 
         if (self.keyboard_handler.session_on and self.mouse_handler.session_on) is False:
             if not self.server.connected.value:
-                print("Session Start Error : Not Connected")
+                log_to_logging_file("Session Start Error : Not Connected") if self.master_window.settings.get_setting(
+                    "Logging") else None
                 return
             if self.mouse_thread is not None:
                 self.mouse_thread.join()
@@ -161,10 +165,10 @@ class ServerWindow(QWidget):
             try:
                 self.mouse_thread = threading.Thread(target=self.start_listening_to_controls)
                 self.mouse_thread.start()
-                print("Session Start")
 
+                log_to_logging_file("Session Start") if self.master_window.settings.get_setting("Logging") else None
             except Exception as e:
-                print(f"Session Start Catch : {e}")
+                log_to_logging_file(f"Session Start Catch : {e}") if self.master_window.settings.get_setting("Logging") else None
 
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
         self.disconnect()

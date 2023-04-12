@@ -1,5 +1,5 @@
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QWidget, QKeySequenceEdit, QSpinBox, QGridLayout, QLabel
+from PyQt6.QtWidgets import QWidget, QKeySequenceEdit, QSpinBox, QGridLayout, QLabel, QCheckBox
 
 from Application.Utils.Utils import set_QWidget_content, get_QWidget_content
 
@@ -10,7 +10,8 @@ class SettingsUI(QWidget):
         self.settings = parent.settings
 
         self.settings_widget = {"Session Start": QKeySequenceEdit,
-                                "Buffer Size": QSpinBox}
+                                "Buffer Size": QSpinBox,
+                                "Logging": QCheckBox}
 
         self.settings_widget_refs = {}
 
@@ -18,19 +19,7 @@ class SettingsUI(QWidget):
 
         self.fill_settings()
 
-        self.settings_widget_refs["Session Start"].editingFinished.connect(
-            lambda: self.settings.update_setting(
-                "Session Start",
-                get_QWidget_content(self.settings_widget_refs["Session Start"])
-            )
-        )
-
-        self.settings_widget_refs["Buffer Size"].editingFinished.connect(
-            lambda: self.settings.update_setting(
-                "Buffer Size",
-                get_QWidget_content(self.settings_widget_refs["Buffer Size"])
-            )
-        )
+        self.on_widget_content_changed()
 
     def initialize_ui(self):
         self.main_layout = QGridLayout()
@@ -57,3 +46,32 @@ class SettingsUI(QWidget):
         for widget_key in self.settings_widget_refs:
             setting = self.settings.get_setting(widget_key)
             set_QWidget_content(self.settings_widget_refs[widget_key], setting)
+
+    def on_widget_content_changed(self):
+        # QKeySequenceEdit
+        self.settings_widget_refs["Session Start"].editingFinished.connect(
+            lambda: self.settings.update_setting(
+                "Session Start",
+                get_QWidget_content(self.settings_widget_refs["Session Start"])
+            )
+        )
+
+        # QSpinBox
+        self.settings_widget_refs["Buffer Size"].editingFinished.connect(
+            lambda: self.settings.update_setting(
+                "Buffer Size",
+                get_QWidget_content(self.settings_widget_refs["Buffer Size"])
+            )
+        )
+
+        # QCheckBox
+        self.settings_widget_refs["Logging"].stateChanged.connect(
+            lambda: self.settings.update_setting(
+                "Logging",
+                get_QWidget_content(self.settings_widget_refs["Logging"])
+            )
+        )
+
+    def showNormal(self) -> None:
+        self.fill_settings()
+        super().showNormal()
