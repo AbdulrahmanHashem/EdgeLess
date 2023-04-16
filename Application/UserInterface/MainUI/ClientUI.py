@@ -14,30 +14,28 @@ from Application.UserInterface.LoggingUI.Logging import log_to_logging_file
 
 class ClientWindow(QWidget):
     def setup_ui(self):
-        v_layout = QVBoxLayout()
-        self.setLayout(v_layout)
+        # Set Main Layout
+        self.setLayout(self.main_v_layout)
 
-        self.state = QLabel("")
-        v_layout.addWidget(self.state, alignment=Qt.AlignmentFlag.AlignCenter)
+        # Adding Main Components.
+        self.main_v_layout.addWidget(self.state, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.main_v_layout.addLayout(self.H_layout)
+        self.main_v_layout.addWidget(self.switch, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        H_layout = QHBoxLayout()
-        v_layout.addLayout(H_layout)
+        # Adding id and port Widgets to the H Layout.
+        self.H_layout.addWidget(self.id)
+        self.H_layout.addWidget(self.port)
+
+        # Setup Port and ID Widgets Settings.
+        self.port.setMinimum(0)
+        self.port.setMaximum(65535)
+        self.port.setValue(9999)
 
         text = ""
         for i in socket.gethostbyname_ex(socket.gethostname())[2][-1].split(".")[0:3]:
             text = text + f"{i}."
-        self.id = QTextEdit(text)
+        self.id.setText(text)
         self.id.setMaximumSize(210, 26)
-        H_layout.addWidget(self.id)
-
-        self.port = QSpinBox()
-        self.port.setMinimum(0)
-        self.port.setMaximum(65535)
-        self.port.setValue(9999)
-        H_layout.addWidget(self.port)
-
-        self.switch = QPushButton("Connect")
-        v_layout.addWidget(self.switch, alignment=Qt.AlignmentFlag.AlignCenter)
 
     def on_connected(self, new):
         if new is None:
@@ -60,7 +58,19 @@ class ClientWindow(QWidget):
     def __init__(self, parent):
         super().__init__()
         self.master_window = parent
-        self.setup_ui()
+
+        # initialize UI Components.
+        self.main_v_layout = QVBoxLayout()
+        self.H_layout = QHBoxLayout()
+
+        self.state = QLabel("")
+
+        self.id = QTextEdit()
+        self.port = QSpinBox()
+
+        self.switch = QPushButton("Connect")
+
+        self.setup_ui()    # Setup UI components.
 
         self.mouse_thread = None
         self.connecting_thread = None
@@ -140,4 +150,3 @@ class ClientWindow(QWidget):
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
         self.disconnect()
         super().closeEvent(a0)
-

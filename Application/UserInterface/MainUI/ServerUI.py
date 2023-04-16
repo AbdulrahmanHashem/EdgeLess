@@ -14,53 +14,49 @@ from Application.UserInterface.LoggingUI.Logging import log_to_logging_file
 
 
 class ServerWindow(QWidget):
+    def enable(self):
+        if self.address.isEnabled() and self.port.isEnabled():
+            self.address.setEnabled(False)
+            self.port.setEnabled(False)
+        elif self.address.isEnabled() is False or self.port.isEnabled() is False:
+            self.address.setEnabled(True)
+            self.port.setEnabled(True)
+        else:
+            self.address.setEnabled(True)
+            self.port.setEnabled(True)
+
     def setup_ui(self):
-        v_layout = QVBoxLayout()
-        self.setLayout(v_layout)
-        #
-        self.addresses = QLabel(str(socket.gethostbyname_ex(socket.gethostname())[2]))
-        v_layout.addWidget(self.addresses, alignment=Qt.AlignmentFlag.AlignCenter)
+        # Setting Main Layout.
+        self.setLayout(self.main_v_layout)
 
-        H_layout = QHBoxLayout()
-        v_layout.addLayout(H_layout)
+        # Adding All Available Addresses.
+        self.main_v_layout.addWidget(self.addresses, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        def enable():
-            if self.address.isEnabled() and self.port.isEnabled():
-                self.address.setEnabled(False)
-                self.port.setEnabled(False)
-            elif self.address.isEnabled() is False or self.port.isEnabled() is False:
-                self.address.setEnabled(True)
-                self.port.setEnabled(True)
-            else:
-                self.address.setEnabled(True)
-                self.port.setEnabled(True)
+        # Adding Server Address layout to the main layout.
+        self.main_v_layout.addLayout(self.H_layout)
 
-        #
-        self.edit = QPushButton("Edit")
-        H_layout.addWidget(self.edit)
+        # Adding Server Address layout components.
+        self.H_layout.addWidget(self.edit)
+        self.H_layout.addWidget(self.address)
+        self.H_layout.addWidget(self.port)
+
+        # Setting Server Address layout components settings.
         self.edit.setMaximumWidth(50)
-        self.edit.clicked.connect(enable)
+        self.edit.clicked.connect(self.enable)
 
-        self.address = QLineEdit(str(socket.gethostbyname_ex(socket.gethostname())[2][-1]))
         self.address.setMaximumSize(150, 26)
         self.address.setEnabled(False)
         self.address.editingFinished.connect(lambda: self.address.setEnabled(False))
-        H_layout.addWidget(self.address)
 
-        self.port = QSpinBox()
         self.port.setMinimum(0)
         self.port.setMaximum(65535)
         self.port.setValue(9999)
         self.port.setEnabled(False)
         self.port.editingFinished.connect(lambda: self.port.setEnabled(False))
-        H_layout.addWidget(self.port)
 
-        self.status = QLabel()
-        v_layout.addWidget(self.status, alignment=Qt.AlignmentFlag.AlignCenter)
-
-        #
-        self.start = QPushButton("Start Server")
-        v_layout.addWidget(self.start, alignment=Qt.AlignmentFlag.AlignCenter)
+        # Adding Address text, Status text and Start button to the main layout.
+        self.main_v_layout.addWidget(self.status, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.main_v_layout.addWidget(self.start, alignment=Qt.AlignmentFlag.AlignCenter)
 
     def on_connected(self, new):
         if new is None:
@@ -83,6 +79,15 @@ class ServerWindow(QWidget):
     def __init__(self, parent):
         super().__init__()
         self.master_window = parent
+
+        self.main_v_layout = QVBoxLayout()
+        self.H_layout = QHBoxLayout()
+        self.addresses = QLabel(str(socket.gethostbyname_ex(socket.gethostname())[2]))
+        self.address = QLineEdit(str(socket.gethostbyname_ex(socket.gethostname())[2][-1]))
+        self.port = QSpinBox()
+        self.edit = QPushButton("Edit")
+        self.start = QPushButton("Start Server")
+        self.status = QLabel()
 
         self.setup_ui()
 
@@ -173,4 +178,3 @@ class ServerWindow(QWidget):
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
         self.disconnect()
         super().closeEvent(a0)
-
